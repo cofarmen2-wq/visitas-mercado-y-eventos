@@ -5,50 +5,49 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Colores de Fondo de Borde a Borde para WebView / APK */
+/* Fondos globales que afectan toda la APK/Navegador */
 html, body {
     min-height: 100vh;
     width: 100%;
-    margin: 0;
-    padding: 0;
-    transition: background-color 0.4s ease, color 0.4s ease;
+    transition: background-color 0.3s ease;
 }
 
 body {
     padding: 15px;
 }
 
-/* Aplicación de colores según modo */
-html.modo-normal, body.modo-normal {
+/* Modo Normal */
+html.modo-normal, body.modo-normal, .app-container.modo-normal {
     background-color: #ffffff !important;
-    color: #2c3e50;
+    color: #333333;
 }
 
-html.modo-mercadolibre, body.modo-mercadolibre {
-    background-color: #fff159 !important; /* Amarillo Mercado Libre */
+/* Modo Mercado Libre */
+html.modo-mercadolibre, body.modo-mercadolibre, .app-container.modo-mercadolibre {
+    background-color: #fff159 !important; /* Amarillo */
     color: #222222;
 }
 
-html.modo-evento, body.modo-evento {
-    background-color: #ff9800 !important; /* Anaranjado Eventos */
+/* Modo Evento Masivo */
+html.modo-evento, body.modo-evento, .app-container.modo-evento {
+    background-color: #ff9800 !important; /* Anaranjado */
     color: #ffffff;
 }
 
 .app-container {
     max-width: 800px;
     margin: 0 auto;
-    background: #ffffff;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    color: #333333;
+    transition: background-color 0.3s ease;
 }
 
 .app-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 2px solid rgba(0,0,0,0.1);
     padding-bottom: 15px;
     margin-bottom: 20px;
     flex-wrap: wrap;
@@ -71,15 +70,17 @@ html.modo-evento, body.modo-evento {
     border-radius: 6px;
     border: 1px solid #ccc;
     font-weight: bold;
+    background-color: #ffffff;
+    color: #333333;
 }
 
 .event-config-panel {
-    background: #fff3e0;
-    border: 1px solid #ffe0b2;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.15);
     padding: 12px;
     border-radius: 8px;
     margin-bottom: 20px;
-    color: #333333;
+    color: inherit;
 }
 
 .event-input-group {
@@ -122,6 +123,8 @@ input, select, textarea {
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 1rem;
+    background-color: #ffffff;
+    color: #333333;
 }
 
 .scanner-input-container {
@@ -152,30 +155,10 @@ button {
     font-weight: bold;
 }
 
-.btn-submit {
-    background-color: #27ae60;
-    color: white;
-    flex: 2;
-}
-
-.btn-secondary {
-    background-color: #7f8c8d;
-    color: white;
-    flex: 1;
-}
-
-.btn-qr {
-    background-color: #2980b9;
-    color: white;
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-.btn-small {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-}
-
+.btn-submit { background-color: #27ae60; color: white; flex: 2; }
+.btn-secondary { background-color: #7f8c8d; color: white; flex: 1; }
+.btn-qr { background-color: #2980b9; color: white; width: 100%; margin-bottom: 10px; }
+.btn-small { padding: 8px 12px; font-size: 0.85rem; }
 .btn-save { background-color: #2980b9; color: white; }
 .btn-danger { background-color: #c0392b; color: white; }
 
@@ -194,11 +177,6 @@ button {
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-.btn-whatsapp:hover {
-    background-color: #1ebd56;
 }
 
 #reader {
