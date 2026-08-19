@@ -29,7 +29,7 @@ const maestroSectores = {
         { nombre: "Ganem Victoria", contacto: "549261551344" },
         { nombre: "Martin Marcelo", contacto: "5492615320950" }
     ],
-    "Consejo": [{ nombre: "Ganem Victoria", contacto: "5492615513444" }],
+    "Consejo": [{ nombre: "Ganem Victoria", contacto: "549261551344" }],
     "Funsad": [{ nombre: "Ganem Victoria", contacto: "549261551344" }],
     "Lobby": [
         { nombre: "Sanchez Alejandro", contacto: "5492615158389" },
@@ -95,19 +95,29 @@ const maestroSectores = {
 document.addEventListener('DOMContentLoaded', () => {
     cargarSectores();
 
-    document.getElementById('escaneoRaw').addEventListener('change', (e) => procesarLectura(e.target.value));
+    const escaneoRaw = document.getElementById('escaneoRaw');
+    if (escaneoRaw) {
+        escaneoRaw.addEventListener('change', (e) => procesarLectura(e.target.value));
+    }
 
-    document.getElementById('anfitrion').addEventListener('change', (e) => {
-        const selectedOption = e.target.options[e.target.selectedIndex];
-        contactoAnfitrionActual = selectedOption ? (selectedOption.dataset.contacto || "N/A") : "";
-    });
+    const selectAnfitrion = document.getElementById('anfitrion');
+    if (selectAnfitrion) {
+        selectAnfitrion.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            contactoAnfitrionActual = selectedOption ? (selectedOption.dataset.contacto || "N/A") : "";
+        });
+    }
 
-    const modoInicial = document.getElementById('modoApp').value;
-    cambiarModoApp(modoInicial);
+    // Inicializar el modo
+    const selectModo = document.getElementById('modoApp');
+    if (selectModo) {
+        cambiarModoApp(selectModo.value);
+    }
 });
 
 function cargarSectores() {
     const selectSector = document.getElementById('sector');
+    if (!selectSector) return;
     selectSector.innerHTML = '<option value="">Seleccione un sector...</option>';
     Object.keys(maestroSectores).forEach(sec => {
         const option = document.createElement('option');
@@ -120,6 +130,7 @@ function cargarSectores() {
 function actualizarAnfitriones() {
     const sector = document.getElementById('sector').value;
     const selectAnfitrion = document.getElementById('anfitrion');
+    if (!selectAnfitrion) return;
     selectAnfitrion.innerHTML = '<option value="">Seleccione anfitrión...</option>';
 
     if (sector && maestroSectores[sector]) {
@@ -133,11 +144,11 @@ function actualizarAnfitriones() {
     }
 }
 
-// Función principal de cambio de modo
 function cambiarModoApp(modo) {
     const root = document.documentElement;
     const body = document.body;
     const container = document.querySelector('.app-container');
+    
     const groupBultos = document.getElementById('groupBultos');
     const panelEvento = document.getElementById('panelEventoConfig');
     const lblAnfitrion = document.getElementById('lblAnfitrion');
@@ -147,46 +158,52 @@ function cambiarModoApp(modo) {
     const inputObs = document.getElementById('observaciones');
     const btnWA = document.getElementById('btnWhatsApp');
 
-    // Remover clases anteriores
-    root.className = '';
-    body.className = '';
-    container.className = 'app-container';
+    // Limpiar clases previas
+    const clasesAnteriores = ['modo-normal', 'modo-mercadolibre', 'modo-evento'];
+    root.classList.remove(...clasesAnteriores);
+    body.classList.remove(...clasesAnteriores);
+    if (container) container.classList.remove(...clasesAnteriores);
 
-    // Aplicar clase nueva
-    root.classList.add('modo-' + modo);
-    body.classList.add('modo-' + modo);
-    container.classList.add('modo-' + modo);
+    // Aplicar la nueva clase de modo
+    const nuevaClase = 'modo-' + modo;
+    root.classList.add(nuevaClase);
+    body.classList.add(nuevaClase);
+    if (container) container.classList.add(nuevaClase);
 
+    // Ajustes de elementos en pantalla
     if (modo === 'mercadolibre') {
-        groupBultos.style.display = 'block';
-        panelEvento.style.display = 'none';
-        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Propietario';
-        inputEmpresa.value = 'Mercado libre';
-        btnWA.style.display = 'none';
+        if (groupBultos) groupBultos.style.display = 'block';
+        if (panelEvento) panelEvento.style.display = 'none';
+        if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Propietario';
+        if (inputEmpresa) inputEmpresa.value = 'Mercado libre';
+        if (btnWA) btnWA.style.display = 'none';
 
     } else if (modo === 'evento') {
-        groupBultos.style.display = 'none';
-        panelEvento.style.display = 'block';
-        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión';
-        inputEmpresa.value = 'Visita';
+        if (groupBultos) groupBultos.style.display = 'none';
+        if (panelEvento) panelEvento.style.display = 'block';
+        if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión';
+        if (inputEmpresa) inputEmpresa.value = 'Visita';
 
-        selectSector.value = 'EVENTO';
-        actualizarAnfitriones();
-        selectAnfitrion.value = 'EVENTO';
+        if (selectSector) {
+            selectSector.value = 'EVENTO';
+            actualizarAnfitriones();
+        }
+        if (selectAnfitrion) selectAnfitrion.value = 'EVENTO';
 
         const eventoGuardado = localStorage.getItem('nombreEventoFijo');
         if (eventoGuardado) {
-            document.getElementById('nombreEvento').value = eventoGuardado;
-            inputObs.value = eventoGuardado;
+            const inputNombreEvento = document.getElementById('nombreEvento');
+            if (inputNombreEvento) inputNombreEvento.value = eventoGuardado;
+            if (inputObs) inputObs.value = eventoGuardado;
         }
-        btnWA.style.display = 'none';
+        if (btnWA) btnWA.style.display = 'none';
 
     } else { // Normal
-        groupBultos.style.display = 'none';
-        panelEvento.style.display = 'none';
-        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe';
-        inputEmpresa.value = '';
-        btnWA.style.display = 'none';
+        if (groupBultos) groupBultos.style.display = 'none';
+        if (panelEvento) panelEvento.style.display = 'none';
+        if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe';
+        if (inputEmpresa) inputEmpresa.value = '';
+        if (btnWA) btnWA.style.display = 'none';
     }
 }
 
