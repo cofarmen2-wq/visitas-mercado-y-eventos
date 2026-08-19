@@ -5,7 +5,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Fondos globales que afectan toda la APK/Navegador */
+/* Aplicación de fondo a toda la pantalla */
 html, body {
     min-height: 100vh;
     width: 100%;
@@ -16,21 +16,19 @@ body {
     padding: 15px;
 }
 
-/* Modo Normal */
+/* Modos de Fondo Globales */
 html.modo-normal, body.modo-normal, .app-container.modo-normal {
-    background-color: #ffffff !important;
+    background-color: #f4f6f9 !important;
     color: #333333;
 }
 
-/* Modo Mercado Libre */
 html.modo-mercadolibre, body.modo-mercadolibre, .app-container.modo-mercadolibre {
-    background-color: #fff159 !important; /* Amarillo */
+    background-color: #fff159 !important; /* Amarillo Mercado Libre */
     color: #222222;
 }
 
-/* Modo Evento Masivo */
 html.modo-evento, body.modo-evento, .app-container.modo-evento {
-    background-color: #ff9800 !important; /* Anaranjado */
+    background-color: #ff9800 !important; /* Naranja Evento Masivo */
     color: #ffffff;
 }
 
