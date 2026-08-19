@@ -5,35 +5,42 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Transiciones suaves de fondo para el cambio de modo */
-body {
+/* Colores de Fondo de Borde a Borde para WebView / APK */
+html, body {
+    min-height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
     transition: background-color 0.4s ease, color 0.4s ease;
-    padding: 20px;
 }
 
-/* Esquemas de Color por Modo */
-body.modo-normal {
-    background-color: #ffffff;
+body {
+    padding: 15px;
+}
+
+/* Aplicación de colores según modo */
+html.modo-normal, body.modo-normal {
+    background-color: #ffffff !important;
     color: #2c3e50;
 }
 
-body.modo-mercadolibre {
-    background-color: #fff159; /* Amarillo característico */
+html.modo-mercadolibre, body.modo-mercadolibre {
+    background-color: #fff159 !important; /* Amarillo Mercado Libre */
     color: #222222;
 }
 
-body.modo-evento {
-    background-color: #ff9800; /* Anaranjado vibrante */
+html.modo-evento, body.modo-evento {
+    background-color: #ff9800 !important; /* Anaranjado Eventos */
     color: #ffffff;
 }
 
 .app-container {
     max-width: 800px;
     margin: 0 auto;
-    background: rgba(255, 255, 255, 0.95);
+    background: #ffffff;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     color: #333333;
 }
 
@@ -66,13 +73,13 @@ body.modo-evento {
     font-weight: bold;
 }
 
-/* Panel de eventos */
 .event-config-panel {
     background: #fff3e0;
     border: 1px solid #ffe0b2;
     padding: 12px;
     border-radius: 8px;
     margin-bottom: 20px;
+    color: #333333;
 }
 
 .event-input-group {
@@ -171,6 +178,28 @@ button {
 
 .btn-save { background-color: #2980b9; color: white; }
 .btn-danger { background-color: #c0392b; color: white; }
+
+.whatsapp-container {
+    max-width: 800px;
+    margin: 15px auto 0 auto;
+}
+
+.btn-whatsapp {
+    width: 100%;
+    background-color: #25d366;
+    color: white;
+    font-size: 1.1rem;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.btn-whatsapp:hover {
+    background-color: #1ebd56;
+}
 
 #reader {
     width: 100%;
