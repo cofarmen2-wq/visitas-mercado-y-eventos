@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body class="modo-normal">
-    <div class="app-container">
+    <div class="app-container modo-normal">
         <header class="app-header">
             <div class="logo-container">
                 <img src="Logo qr-u.png" alt="QR-U Logo" class="app-logo">
@@ -30,7 +30,6 @@
         </header>
 
         <main class="main-content">
-            <!-- Barra de Configuración de Nombre de Evento -->
             <div id="panelEventoConfig" class="event-config-panel" style="display: none;">
                 <label for="nombreEvento"><i class="fa-solid fa-calendar-day"></i> Nombre del Evento Fijo:</label>
                 <div class="event-input-group">
@@ -75,7 +74,6 @@
                         </select>
                     </div>
 
-                    <!-- Columna H: Cantidad de bultos (Mercado libre) -->
                     <div class="form-group" id="groupBultos" style="display: none;">
                         <label for="cantidadBultos"><i class="fa-solid fa-boxes-stacked"></i> Cantidad de Bultos</label>
                         <input type="number" id="cantidadBultos" min="1" value="1" placeholder="Ej: 1, 2, 5...">
@@ -97,7 +95,6 @@
         </main>
     </div>
 
-    <!-- Botón de Envío por WhatsApp -->
     <div class="whatsapp-container">
         <button type="button" id="btnWhatsApp" onclick="enviarWhatsApp()" class="btn-whatsapp" style="display: none;">
             <i class="fa-brands fa-whatsapp"></i> Enviar WhatsApp al Anfitrión
