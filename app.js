@@ -1,8 +1,3 @@
-/ =========================================================================
-const html5QrCode = new Html5Qrcode("reader");
-
-const URL_API_GOOGLE = 'https://script.google.com/macros/s/AKfycbxeRqX9w4SUUu2yGzNre3hVAr-RGTxXO8_rZCxUcOWe9G376fqhlIS43c45-SvanGni/exec';
-
 // =========================================================================
 const html5QrCode = new Html5Qrcode("reader");
 
