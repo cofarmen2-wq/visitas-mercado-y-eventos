@@ -108,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Inicializar el modo
     const selectModo = document.getElementById('modoApp');
     if (selectModo) {
         cambiarModoApp(selectModo.value);
@@ -158,19 +157,16 @@ function cambiarModoApp(modo) {
     const inputObs = document.getElementById('observaciones');
     const btnWA = document.getElementById('btnWhatsApp');
 
-    // Limpiar clases previas
     const clasesAnteriores = ['modo-normal', 'modo-mercadolibre', 'modo-evento'];
     root.classList.remove(...clasesAnteriores);
     body.classList.remove(...clasesAnteriores);
     if (container) container.classList.remove(...clasesAnteriores);
 
-    // Aplicar la nueva clase de modo
     const nuevaClase = 'modo-' + modo;
     root.classList.add(nuevaClase);
     body.classList.add(nuevaClase);
     if (container) container.classList.add(nuevaClase);
 
-    // Ajustes de elementos en pantalla
     if (modo === 'mercadolibre') {
         if (groupBultos) groupBultos.style.display = 'block';
         if (panelEvento) panelEvento.style.display = 'none';
@@ -198,7 +194,7 @@ function cambiarModoApp(modo) {
         }
         if (btnWA) btnWA.style.display = 'none';
 
-    } else { // Normal
+    } else {
         if (groupBultos) groupBultos.style.display = 'none';
         if (panelEvento) panelEvento.style.display = 'none';
         if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe';
