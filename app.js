@@ -304,3 +304,112 @@ function limpiarFormulario() {
     document.getElementById('cantidadBultos').value = '1';
     document.getElementById('escaneoRaw').focus();
 }
+let contactoAnfitrionActual = "";
+
+function actualizarAnfitriones() {
+    const sector = document.getElementById('sector').value;
+    const selectAnfitrion = document.getElementById('anfitrion');
+    selectAnfitrion.innerHTML = '<option value="">Seleccione anfitrión...</option>';
+
+    if (sector && maestroSectores[sector]) {
+        maestroSectores[sector].forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.nombre;
+            option.textContent = p.nombre;
+            option.dataset.contacto = p.contacto;
+            selectAnfitrion.appendChild(option);
+        });
+    }
+}
+
+// Escuchar selección de anfitrión para guardar su número
+document.getElementById('anfitrion').addEventListener('change', function(e) {
+    const selectedOption = e.target.options[e.target.selectedIndex];
+    contactoAnfitrionActual = selectedOption ? selectedOption.dataset.contacto : "";
+});
+
+function cambiarModoApp(modo) {
+    const body = document.body;
+    const html = document.documentElement;
+    const groupBultos = document.getElementById('groupBultos');
+    const panelEvento = document.getElementById('panelEventoConfig');
+    const lblAnfitrion = document.getElementById('lblAnfitrion');
+    const inputEmpresa = document.getElementById('empresa');
+    const selectSector = document.getElementById('sector');
+    const selectAnfitrion = document.getElementById('anfitrion');
+    const inputObs = document.getElementById('observaciones');
+    const btnWA = document.getElementById('btnWhatsApp');
+
+    // Aplicación de clases en HTML y BODY para compatibilidad total con WebView/APK
+    html.className = 'modo-' + modo;
+    body.className = 'modo-' + modo;
+
+    if (modo === 'mercadolibre') {
+        groupBultos.style.display = 'block';
+        panelEvento.style.display = 'none';
+        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Propietario';
+        inputEmpresa.value = 'Mercado libre';
+        btnWA.style.display = 'none';
+        
+    } else if (modo === 'evento') {
+        groupBultos.style.display = 'none';
+        panelEvento.style.display = 'block';
+        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión';
+        inputEmpresa.value = 'Visita';
+        
+        selectSector.value = 'EVENTO';
+        actualizarAnfitriones();
+        selectAnfitrion.value = 'EVENTO';
+        
+        const eventoGuardado = localStorage.getItem('nombreEventoFijo');
+        if (eventoGuardado) inputObs.value = eventoGuardado;
+        btnWA.style.display = 'none';
+
+    } else { // Normal
+        groupBultos.style.display = 'none';
+        panelEvento.style.display = 'none';
+        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe';
+        inputEmpresa.value = '';
+        btnWA.style.display = 'none';
+    }
+}
+
+// Función para abrir WhatsApp Web/App
+function enviarWhatsApp() {
+    const datos = document.getElementById('datosPersonales').value;
+    const empresa = document.getElementById('empresa').value;
+    const sector = document.getElementById('sector').value;
+    const anfitrion = document.getElementById('anfitrion').value;
+
+    if (!contactoAnfitrionActual || contactoAnfitrionActual === "N/A") {
+        alert("El anfitrión seleccionado no tiene un número de contacto válido.");
+        return;
+    }
+
+    const mensaje = `*Aviso de Visita - COFARMEN*\n\nHola *${anfitrion}*, se ha registrado el ingreso de:\n👤 *Persona:* ${datos}\n🏢 *Empresa:* ${empresa}\n📍 *Sector:* ${sector}`;
+    const urlWA = `https://api.whatsapp.com/send?phone=${contactoAnfitrionActual}&text=${encodeURIComponent(mensaje)}`;
+    
+    window.open(urlWA, '_blank');
+}
+
+// Al registrar exitosamente, mostrar/abrir WhatsApp si aplica
+function registrarIngreso() {
+    // ... Código de registro previo ...
+    fetch(URL_API_GOOGLE, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        alert('Ingreso registrado correctamente.');
+        
+        // Si hay un contacto válido, muestra el botón y permite enviar
+        if (contactoAnfitrionActual && contactoAnfitrionActual !== "N/A") {
+            document.getElementById('btnWhatsApp').style.display = 'block';
+            enviarWhatsApp(); // Envío automático
+        } else {
+            limpiarFormulario();
+        }
+    });
+}
