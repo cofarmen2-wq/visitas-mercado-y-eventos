@@ -255,20 +255,30 @@ function iniciarEscaneo() {
 }
 
 function enviarWhatsApp() {
+    const modo = document.getElementById('modoApp').value;
     const datos = document.getElementById('datosPersonales').value;
     const empresa = document.getElementById('empresa').value;
     const sector = document.getElementById('sector').value;
     const anfitrion = document.getElementById('anfitrion').value;
+    const bultos = document.getElementById('cantidadBultos').value;
 
     if (!contactoAnfitrionActual || contactoAnfitrionActual === "N/A") {
         alert("El anfitrión no posee número registrado.");
         return;
     }
 
-    const mensaje = `*Aviso de Visita - COFARMEN*\n\nHola *${anfitrion}*, se registró el ingreso de:\n👤 *Persona:* ${datos}\n🏢 *Empresa:* ${empresa}\n📍 *Sector:* ${sector}`;
+    let mensaje = "";
+
+    if (modo === 'mercadolibre') {
+        // Mensaje personalizado para Mercado Libre / Paquetes
+        mensaje = `📦 *¡Hola ${anfitrion}!* Llegó tu pedido, entregado por *${empresa}* (${bultos} bulto/s), que aguarda el retiro en *Puesto 1 de Seguridad*. 🛡️📍`;
+    } else {
+        // Mensaje estándar para Visitas / Eventos
+        mensaje = `👋 *Aviso de Visita - COFARMEN*\n\nHola *${anfitrion}*, se registró el ingreso de:\n👤 *Persona:* ${datos}\n🏢 *Empresa:* ${empresa}\n📍 *Sector:* ${sector}`;
+    }
+
     window.open(`https://api.whatsapp.com/send?phone=${contactoAnfitrionActual}&text=${encodeURIComponent(mensaje)}`, '_blank');
 }
-
 function registrarIngreso() {
     const modo = document.getElementById('modoApp').value;
     const datos = document.getElementById('datosPersonales').value;
