@@ -5,6 +5,36 @@ function doGet() {
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    var fecha = new Date();
+    var fechaFormatted = Utilities.formatDate(fecha, "GMT-3", "dd/MM/yyyy HH:mm:ss");
+    
+    // Mapeo de Columnas A -> H:
+    // A: Fecha/Hora | B: Modo | C: Datos Personales | D: Empresa
+    // E: Sector | F: Anfitrión / Propietario | G: Observaciones | H: Bultos / Cantidad
+    sheet.appendRow([
+      fechaFormatted,
+      data.modo || 'normal',
+      data.datosPersonales || '',
+      data.empresa || '',
+      data.sector || '',
+      data.anfitrion || '',
+      data.observaciones || '',
+      data.bultos || ''
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({"result": "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({"result": "error", "error": err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
 
 function obtenerDatos() {
   try {
