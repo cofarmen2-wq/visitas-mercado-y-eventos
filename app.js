@@ -1,207 +1,338 @@
-// Servir la interfaz web
-function doGet() {
-  return HtmlService.createTemplateFromFile('index')
-    .evaluate()
-    .setTitle('Relevamiento de Equipos - Flujo Guiado')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-}
+// =========================================================================
+// 1. CONFIGURACIÓN DE ENLACES Y CONEXIONES (REEMPLAZÁ ACÁ)
+// =========================================================================
+const html5QrCode = new Html5Qrcode("reader");
 
-// Obtener estructura desde MAESTRO-
-function getEstructuraEquipos() {
-  var ss = SpreadsheetApp.openById('1zjdotDKs5wl1Uf1TRcalj4IunR-1tSLI_BY8dNkPlss');
-  var sheetMaestro = ss.getSheetByName('MAESTRO-');
-  
-  if (!sheetMaestro) return [];
-  
-  var lastRow = sheetMaestro.getLastRow();
-  var lastColumn = sheetMaestro.getLastColumn();
-  
-  if (lastRow < 1 || lastColumn < 1) return [];
-  
-  var datos = sheetMaestro.getRange(1, 1, lastRow, lastColumn).getValues();
-  var estructura = [];
-  
-  for (var col = 0; col < lastColumn; col++) {
-    var tipo = datos[0][col];
+// PEGÁ ACÁ EL ENLACE LARGO QUE TE DIO GOOGLE AL IMPLEMENTAR (Termina en /exec)
+const URL_API_GOOGLE = 'https://script.google.com/macros/s/AKfycbyZOweDCad2gQ_pzn0rDuMg4EWbxow1x8RZos8M1JiaJt2Xe_hXVOnO5N07QyVn6NMZ/exec';
+
+// Dejamos esta constante vieja acá arriba por si tu HTML o algún script la requiere, no molesta.
+const URL_API_SHEETDB = 'https://sheetdb.io/api/v1/no_se_usa_pero_queda_guardada';
+
+const maestroSectores = {
+    "Mostrador": [{ nombre: "Atención Mostrador", contacto: "N/A" }],
+    "PLANTA LOGISTICA": [{ nombre: "MUGNECO ADRIAN", contacto: "5492615320950" },
+                         {nombre:"Carbajo Rodrigo",contacto: "5492615320950"},
+                         {nombre:"Di Lorenzo Diego",contacto: "5492615320950"}],
+    "CAPITAL HUMANO": [
+        { nombre: "Fernández Rubén", contacto: "5492615320950" },
+        { nombre: "Pablo Iacobucci", contacto: "5492614168508" },
+        { nombre: "Tissera Mariana", contacto: "5492615320950" },
     
-    if (tipo !== null && tipo.toString().trim() !== "") {
-      var listaEquipos = [];
-      for (var row = 1; row < lastRow; row++) {
-        var nombreEquipo = datos[row][col];
-        if (nombreEquipo !== null && nombreEquipo.toString().trim() !== "") {
-          listaEquipos.push(nombreEquipo.toString().trim());
+    ],
+    "Administracion": [
+        { nombre: "Martin Marcelo", contacto: "5492615320950" },
+        { nombre: "Bustos Marcos", contacto: "5492615320950" },
+        { nombre: "Videla Javier", contacto: "5492615320950" },
+        { nombre: "Agüero Antonio", contacto: "5492615320950" },
+        { nombre: "Velez Daniel", contacto: "N/A" }
+    ],
+     "Gerencia": [
+        { nombre: "Funes Cristian", contacto: "5492615320950" },
+        { nombre: "Pablo Iacobucci", contacto: "5492614168508" },
+         { nombre: "Ganem Victoria", contacto: "549261551344" },
+        { nombre: "Martin Marcelo", contacto: "5492615320950" },
+    
+    ],
+    "Consejo": [{ nombre: "Ganem Victoria", contacto: "5492615513444" }],
+    "Funsad": [{ nombre: "Ganem Victoria", contacto: "549261551344" }],
+    "Lobby": [{ nombre: "Sanchez Alejandro", contacto: "5492615158389" },
+              { nombre: "Ganem Victoria", contacto: "549261551344" },
+              { nombre: "Escudero Carina", contacto: "5492615320950" }],
+    "Operador Logistico nave 2": [
+        { nombre: "Constantino Adriana", contacto: "5492615320950" },
+        { nombre: "Valdez Liliana", contacto: "5492616757808" }
+    ],
+    "Comercial": [
+        { nombre: "Molina Andres", contacto: "5492615320950" },
+        { nombre: "Tescari Maria Jose", contacto: "5492615320950" },
+        { nombre: "Reina Julia", contacto: "5492615320950" },
+        { nombre: "Sepulveda Marcela", contacto: "5492615320950" },
+        { nombre: "Sanabria Juan", contacto: "5492615320950" },
+        { nombre: "Perez Agustin", contacto: "5492615320950"}
+    ],
+    "Cajas": [
+        { nombre: "Arce José", contacto: "5492615320950" },
+        { nombre: "Ponce Matias", contacto: "5492615320950" }
+       
+    ],
+    "Administración osep": [
+        { nombre: "Pelayes Sergio", contacto: "5492615320950" },
+        { nombre: "Oropel Walter", contacto: "55492615320950" },
+        { nombre: "Garay Diego", contacto: "5492615320950" },
+        { nombre: "Fernandez Jose Luis", contacto: "5492615320950" },
+        { nombre: "Dominguez Diego", contacto: "5492615320950" },
+        { nombre: "Peroso Vanesa", contacto: "5492615320950" }
+    ],
+    "Recepción Nave 1": [
+        { nombre: "Paris Sebastian", contacto: "5492615320950" },
+        { nombre: "Guerra Emanuel", contacto: "N/A" },
+        { nombre: "Pubill Franco", contacto: "N/A" },
+        { nombre: "Fernandez Leonardo", contacto: "N/A" },
+        { nombre: "Marzonetto Emiliano", contacto: "N/A" }
+    ],
+    "Recepción Nave 2": [
+        { nombre: "Moran Federico", contacto: "N/A" },
+        { nombre: "Montenegro Victor", contacto: "N/A" },
+        {nombre: "Herrera Luis" , contacto: "N/A" }],
+        "Créditos": [
+        { nombre: "Rovatti Dario", contacto: "5492615320950" },
+        { nombre: "Agüero Rocio", contacto: "N/A" },
+        {nombre: "Andreoni Anabela" , contacto: "N/A" }],
+    "Sistemas": [
+        { nombre: "Lujan Omar", contacto: "5492615320950" },
+        { nombre: "Puebla Adrian", contacto: "5492615320950" },
+        {nombre: "Placci Martin" , contacto: "5492615320950" }],
+      "Devolución a Proveedor y/o donaciones": [
+        { nombre: "Alvarez Cecilia", contacto: "5492615320950" }],
+    "Evento": [{ nombre: "Evento", contacto: "N/A" }],
+    "Recepcion Técnica": [
+        { nombre: "Daniel Ríos", contacto: "5492615320950" },
+        { nombre: "Cecilia Nadal", contacto: "5492615320950" },
+        { nombre: "Carina Escudero", contacto: "5492615320950" },
+        { nombre: "Natalia Bustos", contacto: "5492612128450" },
+        { nombre: "Jennifer Agüero", contacto: "5492615320950" }
+    ],
+    "Mantenimiento": [{ nombre: "Marsollier Ivan", contacto: "5492615320950" },
+                      { nombre: "Brizuela Tomas", contacto:"5492615320950"}],
+    "Guardia": [{ nombre: "Puesto 1", contacto: "5492615320950" }],
+    "EVENTO": [{ nombre: "EVENTO", contacto: "N/A" }]
+};
+
+ const escaneoRawInput = document.getElementById('escaneoRaw');
+const datosPersonalesInput = document.getElementById('datosPersonales');
+const empresaInput = document.getElementById('empresa');
+const sectorSelect = document.getElementById('sector');
+const anfitrionSelect = document.getElementById('anfitrion');
+const modoEventoCheck = document.getElementById('modoEvento');
+const groupEmpresa = document.getElementById('groupEmpresa');
+const btnRegistrar = document.getElementById('btnRegistrar');
+const btnLimpiar = document.getElementById('btnLimpiar');
+
+let timeoutAutoGuardar = null;
+
+// Foco automático para disparar con la pistola de hardware
+document.addEventListener('click', (evento) => {
+    const camposPermitidos = ['sector', 'anfitrion', 'observaciones', 'empresa', 'modoEvento'];
+    if (camposPermitidos.includes(evento.target.id) || evento.target.tagName === 'OPTION') {
+        return; 
+    }
+    if (escaneoRawInput) escaneoRawInput.focus();
+});
+
+// Loaders dinámicos de selectores
+function cargarSectores() {
+    if (!sectorSelect) return;
+    sectorSelect.innerHTML = '<option value="">Seleccione un sector...</option>';
+    Object.keys(maestroSectores).forEach(sector => {
+        if(sector !== "EVENTO" || modoEventoCheck.checked) {
+            let option = document.createElement('option');
+            option.value = sector;
+            option.textContent = sector;
+            sectorSelect.appendChild(option);
         }
-      }
-      if (listaEquipos.length > 0) {
-        estructura.push({
-          tipo: tipo.toString().trim(),
-          equipos: listaEquipos
-        });
-      }
-    }
-  }
-  
-  return estructura;
+    });
 }
 
-// Guardar relevamiento completo y enviar correo con perfil ejecutivo/gerencial
-function guardarRelevamientoCompleto(datosGuardar) {
-  try {
-    var ss = SpreadsheetApp.openById('1zjdotDKs5wl1Uf1TRcalj4IunR-1tSLI_BY8dNkPlss');
-    var sheetRegistro = ss.getSheetByName('REGISTRO');
-    
-    if (!sheetRegistro) {
-      throw new Error("No se encontró la pestaña 'REGISTRO'");
-    }
-    
-    var fechaActual = new Date();
-    var fechaFormateada = Utilities.formatDate(fechaActual, ss.getSpreadsheetTimeZone(), "dd/MM/yyyy HH:mm");
-    
-    var filasNuevas = [];
-    var conteoPorTipo = datosGuardar.conteoPorTipo; // Objeto { Tipo: Cantidad }
-    var listaObservados = datosGuardar.equiposObservados; // Lista con fallas u observaciones
-    
-    // 1. Registrar filas en la hoja REGISTRO
-    datosGuardar.todosLosEquipos.forEach(function(item) {
-      filasNuevas.push([
-        fechaFormateada,
-        item.tipo || "",
-        item.equipo || "",
-        item.enciende || "N/A",
-        item.apto || "N/A",
-        item.observaciones || ""
-      ]);
+if (sectorSelect) {
+    sectorSelect.addEventListener('change', (e) => {
+        const sectorSeleccionado = e.target.value;
+        anfitrionSelect.innerHTML = '<option value="">Seleccione anfitrión...</option>';
+        
+        if (sectorSeleccionado && maestroSectores[sectorSeleccionado]) {
+            maestroSectores[sectorSeleccionado].forEach(anf => {
+                let option = document.createElement('option');
+                option.value = anf.nombre;
+                option.textContent = anf.nombre;
+                option.dataset.contacto = anf.contacto; 
+                anfitrionSelect.appendChild(option);
+            });
+            if(maestroSectores[sectorSeleccionado].length === 1) {
+                anfitrionSelect.selectedIndex = 1; 
+            }
+        }
     });
-    
-    if (filasNuevas.length > 0) {
-      sheetRegistro.getRange(
-        sheetRegistro.getLastRow() + 1, 
-        1, 
-        filasNuevas.length, 
-        filasNuevas[0].length
-      ).setValues(filasNuevas);
-    }
-    
-    // 2. Construcción de filas HTML para resumen de equipos por tipo
-    var totalEquipos = 0;
-    var filasResumenHtml = "";
-    for (var tipoKey in conteoPorTipo) {
-      var cant = conteoPorTipo[tipoKey];
-      totalEquipos += cant;
-      filasResumenHtml += '<tr>' +
-        '<td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #334155;"><strong>' + tipoKey + '</strong></td>' +
-        '<td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #1e293b; text-align: center; font-weight: 600;">' + cant + '</td>' +
-      '</tr>';
-    }
+}
 
-    // 3. Construcción de filas HTML para novedades / observaciones
-    var filasObservacionesHtml = "";
-    if (listaObservados.length > 0) {
-      listaObservados.forEach(function(obs) {
-        var estadoBadge = "";
-        if (obs.enciende === 'NO') {
-          estadoBadge = '<span style="background-color: #fef2f2; color: #991b1b; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">🚫 NO ENCIENDE</span>';
-        } else if (obs.apto === 'NO') {
-          estadoBadge = '<span style="background-color: #fff7ed; color: #c2410c; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">⚠️ NO APTO</span>';
+// =========================================================================
+// 4. SISTEMA DE LIMPIEZA Y DESARMADO DE DNI (@ / QR)
+// =========================================================================
+if (escaneoRawInput) {
+    escaneoRawInput.addEventListener('input', () => {
+        const rawText = escaneoRawInput.value.trim();
+        if (!rawText) return;
+
+        if (timeoutAutoGuardar) clearTimeout(timeoutAutoGuardar);
+
+        // Desarmado de DNI tarjeta de formato argentino
+        if (rawText.includes('@')) {
+            const partes = rawText.split('@');
+            if (partes.length >= 5) {
+                const apellido = partes[1].toUpperCase();
+                const nombre = partes[2].toUpperCase();
+                const dni = partes[4];
+                datosPersonalesInput.value = `${apellido}, ${nombre} - DNI: ${dni}`;
+            } else {
+                datosPersonalesInput.value = "FORMATO DNI NO RECONOCIDO";
+            }
+            if (!modoEventoCheck.checked) {
+                groupEmpresa.style.display = 'flex';
+                empresaInput.value = '';
+                empresaInput.focus();
+            }
         } else {
-          estadoBadge = '<span style="background-color: #f0fdf4; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">📝 CON NOTA</span>';
+            // Desarmado de códigos QR con estructura predeterminada
+            const partes = rawText.split(' - ');
+            if (partes.length >= 3) {
+                datosPersonalesInput.value = partes[0].toUpperCase(); 
+                empresaInput.value = partes[2].toUpperCase();         
+                groupEmpresa.style.display = 'none';    
+            } else {
+                datosPersonalesInput.value = rawText.toUpperCase(); 
+            }
         }
 
-        filasObservacionesHtml += '<tr>' +
-          '<td style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #1e293b;"><strong>' + obs.equipo + '</strong><br><span style="font-size: 11px; color: #64748b;">' + obs.tipo + '</span></td>' +
-          '<td style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: center;">' + estadoBadge + '</td>' +
-          '<td style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #475569;">' + (obs.observaciones || "<em>Sin detalle de observación</em>") + '</td>' +
-        '</tr>';
-      });
-    } else {
-      filasObservacionesHtml = '<tr><td colspan="3" style="padding: 16px; text-align: center; color: #166534; background-color: #f0fdf4; font-size: 13px; font-weight: 600;">✅ Todos los equipos evaluados se encuentran operativos y aptos.</td></tr>';
-    }
-
-    // 4. Plantilla de Correo HTML Profesional
-    var cuerpoHtml = 
-      '<!DOCTYPE html>' +
-      '<html>' +
-      '<head>' +
-        '<meta charset="utf-8">' +
-      '</head>' +
-      '<body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: \'Segoe UI\', Helvetica, Arial, sans-serif; color: #1e293b;">' +
-        '<div style="max-width: 650px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">' +
-          
-          '<!-- Encabezado -->' +
-          '<div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 28px 32px; color: #ffffff;">' +
-            '<h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px;">📊 INFORME EJECUTIVO DE RELEVAMIENTO</h1>' +
-            '<p style="margin: 6px 0 0 0; font-size: 13px; color: #93c5fd;">Estado operativo e inventario técnico de equipos</p>' +
-          '</div>' +
-
-          '<!-- Cuerpo Principal -->' +
-          '<div style="padding: 28px 32px;">' +
-            
-            '<!-- Tarjeta Metadatos -->' +
-            '<div style="background-color: #f1f5f9; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; display: table; width: 100%; box-sizing: border-box;">' +
-              '<div style="display: table-cell; vertical-align: middle; font-size: 13px; color: #475569;">' +
-                '📅 <strong>Fecha/Hora:</strong> ' + fechaFormateada + '<br>' +
-                '📦 <strong>Total Evaluado:</strong> ' + totalEquipos + ' unidades' +
-              '</div>' +
-              '<div style="display: table-cell; vertical-align: middle; text-align: right; font-size: 13px; color: #475569;">' +
-                '⚠️ <strong>Novedades:</strong> ' + listaObservados.length + ' caso(s)' +
-              '</div>' +
-            '</div>' +
-
-            '<!-- Sección 1: Cantidad por Tipo -->' +
-            '<h3 style="margin: 0 0 12px 0; font-size: 15px; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">' +
-              '📋 1. RESUMEN DE EQUIPOS POR TIPO' +
-            '</h3>' +
-            '<table style="width: 100%; border-collapse: collapse; margin-bottom: 28px;">' +
-              '<thead>' +
-                '<tr style="background-color: #f8fafc;">' +
-                  '<th style="text-align: left; padding: 10px 14px; border-bottom: 2px solid #cbd5e1; font-size: 12px; color: #64748b; text-transform: uppercase;">Tipo de Equipo</th>' +
-                  '<th style="text-align: center; padding: 10px 14px; border-bottom: 2px solid #cbd5e1; font-size: 12px; color: #64748b; text-transform: uppercase; width: 100px;">Cantidad</th>' +
-                '</tr>' +
-              '</thead>' +
-              '<tbody>' +
-                filasResumenHtml +
-              '</tbody>' +
-            '</table>' +
-
-            '<!-- Sección 2: Detalle de Observaciones -->' +
-            '<h3 style="margin: 0 0 12px 0; font-size: 15px; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">' +
-              '🚨 2. DETALLE DE NOVEDADES Y OBSERVACIONES' +
-            '</h3>' +
-            '<table style="width: 100%; border-collapse: collapse;">' +
-              '<thead>' +
-                '<tr style="background-color: #f8fafc;">' +
-                  '<th style="text-align: left; padding: 10px 14px; border-bottom: 2px solid #cbd5e1; font-size: 12px; color: #64748b; text-transform: uppercase;">Equipo</th>' +
-                  '<th style="text-align: center; padding: 10px 14px; border-bottom: 2px solid #cbd5e1; font-size: 12px; color: #64748b; text-transform: uppercase; width: 130px;">Condición</th>' +
-                  '<th style="text-align: left; padding: 10px 14px; border-bottom: 2px solid #cbd5e1; font-size: 12px; color: #64748b; text-transform: uppercase;">Observación registrada</th>' +
-                '</tr>' +
-              '</thead>' +
-              '<tbody>' +
-                filasObservacionesHtml +
-              '</tbody>' +
-            '</table>' +
-
-          '</div>' +
-
-          '<!-- Pie de página -->' +
-          '<div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px 32px; text-align: center; font-size: 12px; color: #94a3b8;">' +
-            'Este reporte fue generado automáticamente desde el Sistema Control de Relevamiento.' +
-          '</div>' +
-
-        '</div>' +
-      '</body>' +
-      '</html>';
-
-    var destinatario = "porteriacooperativa2017@gmail.com";
-    var asunto = "📊 Reporte  de Relevamiento - " + fechaFormateada;
-    
-    MailApp.sendEmail({
-      to: destinatario,
-      subject: asunto,
-      htmlBody: cuerpoHtml
+        // Auto-guardado instantáneo en Modo Evento Masivo
+        if (modoEventoCheck.checked && datosPersonalesInput.value && !datosPersonalesInput.value.includes("NO RECONOCIDO")) {
+            timeoutAutoGuardar = setTimeout(() => {
+                if (btnRegistrar) btnRegistrar.click(); 
+            }, 200); 
+        }
     });
-    
-    return { exito: true, mensaje: "Relevamiento guardado e informe enviado correctamente." };
-  } catch (error) {
-    return { exito: false, mensaje: error.toString() };
-  }
 }
+
+if (modoEventoCheck) {
+    modoEventoCheck.addEventListener('change', () => {
+        if (modoEventoCheck.checked) {
+            document.body.style.setProperty('--accent-blue', 'var(--accent-event)');
+            groupEmpresa.style.display = 'none';
+            empresaInput.value = "EVENTO";
+            cargarSectores();
+            sectorSelect.value = "EVENTO";
+            sectorSelect.dispatchEvent(new Event('change')); 
+        } else {
+            document.body.style.setProperty('--accent-blue', '#0052cc');
+            groupEmpresa.style.display = 'flex';
+            limpiarFormulario();
+        }
+        if (escaneoRawInput) escaneoRawInput.focus();
+    });
+}
+
+function limpiarFormulario() {
+    if (escaneoRawInput) escaneoRawInput.value = '';
+    if (datosPersonalesInput) datosPersonalesInput.value = '';
+    if (!modoEventoCheck.checked) {
+        if (empresaInput) empresaInput.value = '';
+        if (sectorSelect) sectorSelect.value = '';
+        if (anfitrionSelect) anfitrionSelect.innerHTML = '<option value="">Seleccione anfitrión...</option>';
+    }
+    const obsField = document.getElementById('observaciones');
+    if (obsField) obsField.value = '';
+    if (escaneoRawInput) escaneoRawInput.focus();
+}
+
+if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarFormulario);
+
+// Escaneo por medio de la lente de la cámara del celular
+async function iniciarEscaneo() {
+    if (html5QrCode.isScanning) return;
+    try {
+        await html5QrCode.start(
+            { facingMode: "environment" },
+            { 
+                fps: 20, 
+                // Subimos a 240 para que el DNI entre un poco más cómodo pero siga estando cerca
+                qrbox: { width: 240, height: 240 }, 
+                videoConstraints: {
+                    facingMode: "environment",
+                    // Dejamos un rango estándar para que no tire errores de hardware
+                    width: { min: 640, ideal: 1280 },
+                    height: { min: 480, ideal: 720 }
+                }
+            },
+            (decodedText) => {
+                if (escaneoRawInput) {
+                    escaneoRawInput.value = decodedText;
+                    escaneoRawInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                html5QrCode.stop();
+            },
+            (errorMessage) => {
+                // Dejar vacío para que los reniegos internos de la cámara no molesten en la pantalla
+            }
+        );
+
+        // Intenta aplicar el zoom si la cámara elegida lo soporta
+        const videoTrack = html5QrCode.getRunningTrack();
+        setTimeout(() => {
+            if (videoTrack) {
+                const capabilities = videoTrack.getCapabilities();
+                if (capabilities.zoom) {
+                    videoTrack.applyConstraints({
+                        advanced: [{ zoom: 2.0 }] 
+                    }).catch(err => console.log("Zoom no soportado en esta cámara de respaldo"));
+                }
+            }
+        }, 650); 
+
+    } catch (err) {
+        // Guardamos el error silenciosamente en la consola del navegador en vez de romper con un alert
+        console.log("Aviso de inicio de cámara: ", err);
+    }
+}
+
+// =========================================================================
+// 5. EVENTO REGISTRAR - ENVÍO SEGURO DIRECTO A GOOGLE SCRIPT (NO-CORS)
+// =========================================================================
+if (btnRegistrar) {
+    btnRegistrar.addEventListener('click', async () => {
+        if (!datosPersonalesInput.value || !sectorSelect.value || !anfitrionSelect.value) {
+            alert('Por favor, complete los campos obligatorios antes de registrar.');
+            return;
+        }
+
+        const selectedOption = anfitrionSelect.options[anfitrionSelect.selectedIndex];
+        const nroContacto = selectedOption ? selectedOption.dataset.contacto : '5492615320950';
+        const obsElement = document.getElementById('observaciones');
+        const observacionesTexto = obsElement && obsElement.value ? obsElement.value.toUpperCase() : 'SIN OBSERVACIONES';
+        
+        // Empaquetamos en minúsculas tal cual lo requiere tu script del Excel
+        const datosObj = {
+            "datosPersonales": datosPersonalesInput.value.toUpperCase(),
+            "empresa": (empresaInput.value || "VISITA").toUpperCase(),
+            "sector": sectorSelect.value.toUpperCase(),
+            "anfitrion": anfitrionSelect.value.toUpperCase(),
+            "observaciones": observacionesTexto,
+            "modoEvento": modoEventoCheck.checked // Envía true o false
+        };
+
+        try {
+            // Enviamos como text/plain con mode: no-cors para saltar bloqueos de red
+            await fetch(URL_API_GOOGLE, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify(datosObj)
+            });
+
+            // Al no saltar al catch, el registro fue insertado con éxito en tu Google Sheets
+            alert("✅ Registro enviado a la hoja de cálculo con éxito.");
+
+          
+
+            limpiarFormulario();
+
+        } catch (error) {
+            console.error("Error crítico de red:", error);
+            alert("❌ Error de red. No se pudo conectar con la base de datos de Google.");
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    cargarSectores();
+    if (escaneoRawInput) escaneoRawInput.focus();
+});
