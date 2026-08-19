@@ -1,310 +1,98 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <base target="_top">
+<head>
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      :root {
-        --primary-color: #d4af37;
-        --primary-hover: #b8941f;
-        --bg-color: #f3f1eb;
-        --card-bg: #ffffff;
-        --text-main: #111111;
-        --text-muted: #4b4b4b;
-        --border-color: #d6c27a;
-        --section-bg: #171717;
-        --success-bg: #dcfce7;
-        --success-text: #166534;
-        --error-bg: #fee2e2;
-        --error-text: #991b1b;
-      }
-
-      * { box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-      body { background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 40px 20px; display: flex; justify-content: center; }
-      .container { width: 100%; max-width: 950px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); overflow: hidden; }
-      .header { background: var(--primary-color); color: white; padding: 24px 32px; }
-      .header h1 { margin: 0; font-size: 22px; font-weight: 600; }
-      .header p { margin: 6px 0 0 0; font-size: 14px; color: #93c5fd; }
-      .content { padding: 32px; }
-      .loading-box { text-align: center; padding: 40px; color: var(--text-muted); font-size: 15px; }
-
-      .accordion-item { margin-bottom: 16px; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #fff; }
-      .accordion-button { width: 100%; background-color: var(--section-bg); color: var(--primary-color); padding: 16px 20px; font-size: 15px; font-weight: 700; text-align: left; border: none; outline: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; text-transform: uppercase; }
-      .accordion-button:hover { background-color: #e2e8f0; }
-      .accordion-icon { font-size: 14px; transition: transform 0.3s; }
-      .accordion-button.active .accordion-icon { transform: rotate(180deg); }
-      .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; background-color: #ffffff; }
-      .accordion-content.open { max-height: 3000px; }
-
-      .equipment-table { width: 100%; border-collapse: collapse; }
-      .equipment-table th { background-color: #ffffff; color: var(--text-muted); text-align: left; padding: 10px 16px; font-size: 11px; text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); }
-      .equipment-row { border-bottom: 1px solid var(--border-color); }
-      .equipment-row:last-child { border-bottom: none; }
-      .equipment-row td { padding: 12px 16px; vertical-align: middle; }
-      .equipo-title { font-weight: 600; font-size: 14px; color: var(--text-main); }
-
-      /* Toggle Radio Buttons */
-      .toggle-group { display: inline-flex; background: #f1f5f9; padding: 3px; border-radius: 6px; border: 1px solid var(--border-color); }
-      .toggle-group.disabled { opacity: 0.4; pointer-events: none; }
-      .toggle-group input[type="radio"] { display: none; }
-      .toggle-group label { padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 4px; transition: all 0.15s; user-select: none; }
-      .toggle-group input[type="radio"]:checked + label { background: white; color: var(--primary-color); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
-      .obs-container { display: none; margin-top: 5px; }
-      .obs-container.show { display: block; }
-      .obs-input { width: 100%; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; outline: none; }
-      .obs-input:focus { border-color: var(--primary-color); }
-
-      .actions { display: flex; justify-content: flex-end; margin-top: 24px; }
-      .btn-submit { background-color: var(--primary-color); color: white; border: none; padding: 12px 28px; font-size: 15px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
-      .btn-submit:hover { background-color: var(--primary-hover); }
-      .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-
-      #statusBanner { display: none; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-weight: 500; }
-      #statusBanner.success { background-color: var(--success-bg); color: var(--success-text); }
-      #statusBanner.error { background-color: var(--error-bg); color: var(--error-text); }
-    </style>
-  </head>
-  <body>
-
-    <div class="container">
-      <div class="header">
-        <h1>Sistema de Relevamiento de Equipos</h1>
-        <p>Haga clic en un tipo de equipo para desplegar sus elementos y completar la evaluación</p>
-      </div>
-
-      <div class="content">
-        <div id="statusBanner"></div>
-
-        <form id="relevamientoForm" onsubmit="enviarFormulario(event)">
-          <div id="loading" class="loading-box">Cargando inventario de equipos...</div>
-          <div id="contenedorAcordeon"></div>
-
-          <div class="actions" id="accionesForm" style="display: none;">
-            <button type="submit" id="btnEnviar" class="btn-submit">
-              Guardar Relevamiento y Enviar Correo
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <script>
-      var estructuraGlobal = [];
-      var ID_HOJA_CALCULO = '1zjdotDKs5wl1Uf1TRcalj4IunR-1tSLI_BY8dNkPlss';
-
-      window.onload = function() {
-        google.script.run
-          .withSuccessHandler(renderizarAcordeon)
-          .withFailureHandler(function(err) {
-            document.getElementById('loading').textContent = "Error al cargar datos: " + err;
-          })
-          .getEstructuraEquipos(ID_HOJA_CALCULO);
-      };
-
-      function renderizarAcordeon(estructura) {
-        estructuraGlobal = estructura;
-        document.getElementById('loading').style.display = 'none';
-
-        if (!estructura || estructura.length === 0) {
-          document.getElementById('loading').style.display = 'block';
-          document.getElementById('loading').textContent = "No se encontraron equipos en la pestaña MAESTRO-";
-          return;
-        }
-
-        var contenedor = document.getElementById('contenedorAcordeon');
-        contenedor.innerHTML = '';
-
-        var globalIndex = 0;
-
-        estructura.forEach(function(cat) {
-          var itemDiv = document.createElement('div');
-          itemDiv.className = 'accordion-item';
-
-          var btnHeader = document.createElement('button');
-          btnHeader.type = 'button';
-          btnHeader.className = 'accordion-button';
-          btnHeader.innerHTML = `
-            <span>${cat.tipo} (${cat.equipos.length})</span>
-            <span class="accordion-icon">▼</span>
-          `;
-
-          var contentDiv = document.createElement('div');
-          contentDiv.className = 'accordion-content';
-
-          btnHeader.addEventListener('click', function() {
-            this.classList.toggle('active');
-            contentDiv.classList.toggle('open');
-          });
-
-          var htmlTable = `
-            <table class="equipment-table">
-              <thead>
-                <tr>
-                  <th style="width: 30%;">Equipo</th>
-                  <th style="width: 20%;">¿Enciende?</th>
-                  <th style="width: 20%;">¿Apto?</th>
-                  <th style="width: 30%;">Observaciones</th>
-                </tr>
-              </thead>
-              <tbody>
-          `;
-
-          cat.equipos.forEach(function(equipo) {
-            var idx = globalIndex;
-            htmlTable += `
-              <tr class="equipment-row">
-                <td>
-                  <div class="equipo-title">${equipo}</div>
-                </td>
-                <td>
-                  <div class="toggle-group">
-                    <input type="radio" id="enc_si_${idx}" name="enciende_${idx}" value="SI" onchange="evaluarFlujo(${idx})">
-                    <label for="enc_si_${idx}">SÍ</label>
-                    <input type="radio" id="enc_no_${idx}" name="enciende_${idx}" value="NO" onchange="evaluarFlujo(${idx})">
-                    <label for="enc_no_${idx}">NO</label>
-                  </div>
-                </td>
-                <td>
-                  <div class="toggle-group disabled" id="group_apto_${idx}">
-                    <input type="radio" id="apt_si_${idx}" name="apto_${idx}" value="SI" onchange="evaluarFlujo(${idx})">
-                    <label for="apt_si_${idx}">SÍ</label>
-                    <input type="radio" id="apt_no_${idx}" name="apto_${idx}" value="NO" onchange="evaluarFlujo(${idx})">
-                    <label for="apt_no_${idx}">NO</label>
-                  </div>
-                </td>
-                <td>
-                  <div class="obs-container" id="container_obs_${idx}">
-                    <input type="text" class="obs-input" id="obs_${idx}" placeholder="Indique la observación o fallo...">
-                  </div>
-                </td>
-              </tr>
-            `;
-            globalIndex++;
-          });
-
-          htmlTable += `
-              </tbody>
-            </table>
-          `;
-
-          contentDiv.innerHTML = htmlTable;
-          itemDiv.appendChild(btnHeader);
-          itemDiv.appendChild(contentDiv);
-          contenedor.appendChild(itemDiv);
-        });
-
-        document.getElementById('accionesForm').style.display = 'flex';
-      }
-
-      // Lógica dinámica del flujo del formulario
-      function evaluarFlujo(idx) {
-        var encVal = document.querySelector(`input[name="enciende_${idx}"]:checked`)?.value;
-        var aptGroup = document.getElementById(`group_apto_${idx}`);
-        var aptVal = document.querySelector(`input[name="apto_${idx}"]:checked`)?.value;
-        var obsContainer = document.getElementById(`container_obs_${idx}`);
-
-        if (encVal === 'SI') {
-          // Si enciende está en SÍ -> Habilitar ¿Apto?
-          aptGroup.classList.remove('disabled');
-          
-          if (aptVal === 'NO') {
-            // Si NO está apto -> Desplegar Observaciones
-            obsContainer.classList.add('show');
-          } else {
-            obsContainer.classList.remove('show');
-          }
-        } else if (encVal === 'NO') {
-          // Si NO enciende -> Deshabilitar ¿Apto? y Desplegar Observaciones automáticamente
-          aptGroup.classList.add('disabled');
-          document.querySelectorAll(`input[name="apto_${idx}"]`).forEach(r => r.checked = false);
-          obsContainer.classList.add('show');
-        }
-      }
-
-      function enviarFormulario(e) {
-        e.preventDefault();
-
-        var btn = document.getElementById('btnEnviar');
-        btn.disabled = true;
-        btn.textContent = "Guardando y procesando reporte...";
-
-        var todosLosEquipos = [];
-        var equiposObservados = [];
-        var conteoPorTipo = {};
-        var globalIndex = 0;
-
-        estructuraGlobal.forEach(function(cat) {
-          conteoPorTipo[cat.tipo] = cat.equipos.length;
-
-          cat.equipos.forEach(function(equipo) {
-            var encVal = document.querySelector(`input[name="enciende_${globalIndex}"]:checked`)?.value || '';
-            var aptVal = document.querySelector(`input[name="apto_${globalIndex}"]:checked`)?.value || '';
-            var obsVal = document.getElementById(`obs_${globalIndex}`).value;
-
-            var registro = {
-              tipo: cat.tipo,
-              equipo: equipo,
-              enciende: encVal,
-              apto: aptVal,
-              observaciones: obsVal
-            };
-
-            todosLosEquipos.push(registro);
-
-            // Filtrar para el resumen del correo si no enciende, no está apto o tiene una observación explícita
-            if (encVal === 'NO' || aptVal === 'NO' || obsVal.trim() !== '') {
-              equiposObservados.push(registro);
-            }
-
-            globalIndex++;
-          });
-        });
-
-        var payload = {
-          todosLosEquipos: todosLosEquipos,
-          equiposObservados: equiposObservados,
-          conteoPorTipo: conteoPorTipo
-        };
-
-        google.script.run
-          .withSuccessHandler(function(res) {
-            btn.disabled = false;
-            btn.textContent = "Guardar Relevamiento y Enviar Correo";
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR-U // Control de Visitas</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo-container">
+                <img src="Logo qr-u.png" alt="QR-U Logo" class="app-logo">
+                <div>
+                    <h1>APP INGRESO A COFARMEN</h1>
+                    <p class="subtitle">Control de Accesos</p>
+                </div>
+            </div>
             
-            if (res.exito) {
-              mostrarMensaje(res.mensaje, true);
-              document.getElementById('relevamientoForm').reset();
-              // Deshabilitar dinámicamente campos Apto y Observaciones
-              document.querySelectorAll('.toggle-group[id^="group_apto_"]').forEach(g => g.classList.add('disabled'));
-              document.querySelectorAll('.obs-container').forEach(c => c.classList.remove('show'));
-              // Colapsar desplegables
-              document.querySelectorAll('.accordion-button').forEach(b => b.classList.remove('active'));
-              document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
-            } else {
-              mostrarMensaje("Error: " + res.mensaje, false);
-            }
-          })
-          .withFailureHandler(function(err) {
-            btn.disabled = false;
-            btn.textContent = "Guardar Relevamiento y Enviar Correo";
-            mostrarMensaje("Error de conexión: " + err, false);
-          })
-          .guardarRelevamientoCompleto(payload);
-      }
+            <div class="event-switch-container">
+                <label class="switch-label">
+                    <i class="fa-solid fa-users"></i> ¿Modo Evento Masivo?
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="modoEvento">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </header>
 
-      function mostrarMensaje(texto, esExito) {
-        var banner = document.getElementById('statusBanner');
-        banner.textContent = texto;
-        banner.className = esExito ? 'success' : 'error';
-        banner.style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        <main class="main-content">
+            <form id="formVisita" autocomplete="off" onsubmit="event.preventDefault();">
+                
+                <div class="scanner-input-container">
+                    <label for="escaneoRaw"><i class="fa-solid fa-qrcode"></i> Esperando Escaneo (DNI o QR)...</label>
+                    <input type="text" id="escaneoRaw" placeholder="Haga clic aquí y escanee..." autofocus required>
+                    <span class="scanner-status" id="scannerStatus">Lector Listo</span>
+                </div>
+                <button class="btn-qr" onclick="iniciarEscaneo()">📸 Escanear QR</button>
+<div id="reader"></div>
 
-        setTimeout(function() {
-          banner.style.display = 'none';
-        }, 6000);
-      }
-    </script>
-  </body>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label><i class="fa-solid fa-user"></i> Datos Personales</label>
+                        <input type="text" id="datosPersonales" readonly placeholder="Apellido, Nombre y DNI (Automático)">
+                    </div>
+
+                    <div class="form-group" id="groupEmpresa">
+                        <label for="empresa"><i class="fa-solid fa-building"></i> Empresa / Procedencia</label>
+                        <input type="text" id="empresa" placeholder="Ingrese empresa o farmacia">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sector"><i class="fa-solid fa-map-location-dot"></i> Sector a Visitar</label>
+                        <select id="sector" required>
+                            <option value="">Seleccione un sector...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="anfitrion"><i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe</label>
+                        <select id="anfitrion" required>
+                            <option value="">Seleccione anfitrión...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="observaciones"><i class="fa-solid fa-comment-dots"></i> Observaciones</label>
+                        <textarea id="observaciones" rows="2" placeholder="Notas adicionales del ingreso..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="btnRegistrar" class="btn-submit">
+                        <i class="fa-solid fa-circle-check"></i> Registrar Ingreso
+                    </button>
+                    <button type="button" id="btnLimpiar" class="btn-secondary">
+                        Limpiar Todo
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
+    
+
+    <script src="app.js"></script>
+</body>
+</html>
+    <button id="btnWhatsApp" class="btn-whatsapp" style="display:none; background-color: #25d366; color: white; margin-top: 15px;">
+    🚀 Enviar WhatsApp
+</button>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+</body>
 </html>
