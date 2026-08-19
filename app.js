@@ -1,24 +1,19 @@
 // =========================================================================
-// 1. CONFIGURACIÓN DE ENLACES Y CONEXIONES (REEMPLAZÁ ACÁ)
-// =========================================================================
 const html5QrCode = new Html5Qrcode("reader");
 
-// PEGÁ ACÁ EL ENLACE LARGO QUE TE DIO GOOGLE AL IMPLEMENTAR (Termina en /exec)
 const URL_API_GOOGLE = 'https://script.google.com/macros/s/AKfycbyZOweDCad2gQ_pzn0rDuMg4EWbxow1x8RZos8M1JiaJt2Xe_hXVOnO5N07QyVn6NMZ/exec';
-
-// Dejamos esta constante vieja acá arriba por si tu HTML o algún script la requiere, no molesta.
-const URL_API_SHEETDB = 'https://sheetdb.io/api/v1/no_se_usa_pero_queda_guardada';
 
 const maestroSectores = {
     "Mostrador": [{ nombre: "Atención Mostrador", contacto: "N/A" }],
-    "PLANTA LOGISTICA": [{ nombre: "MUGNECO ADRIAN", contacto: "5492615320950" },
-                         {nombre:"Carbajo Rodrigo",contacto: "5492615320950"},
-                         {nombre:"Di Lorenzo Diego",contacto: "5492615320950"}],
+    "PLANTA LOGISTICA": [
+        { nombre: "MUGNECO ADRIAN", contacto: "5492615320950" },
+        { nombre: "Carbajo Rodrigo", contacto: "5492615320950" },
+        { nombre: "Di Lorenzo Diego", contacto: "5492615320950" }
+    ],
     "CAPITAL HUMANO": [
         { nombre: "Fernández Rubén", contacto: "5492615320950" },
         { nombre: "Pablo Iacobucci", contacto: "5492614168508" },
-        { nombre: "Tissera Mariana", contacto: "5492615320950" },
-    
+        { nombre: "Tissera Mariana", contacto: "5492615320950" }
     ],
     "Administracion": [
         { nombre: "Martin Marcelo", contacto: "5492615320950" },
@@ -27,18 +22,19 @@ const maestroSectores = {
         { nombre: "Agüero Antonio", contacto: "5492615320950" },
         { nombre: "Velez Daniel", contacto: "N/A" }
     ],
-     "Gerencia": [
+    "Gerencia": [
         { nombre: "Funes Cristian", contacto: "5492615320950" },
         { nombre: "Pablo Iacobucci", contacto: "5492614168508" },
-         { nombre: "Ganem Victoria", contacto: "549261551344" },
-        { nombre: "Martin Marcelo", contacto: "5492615320950" },
-    
+        { nombre: "Ganem Victoria", contacto: "549261551344" },
+        { nombre: "Martin Marcelo", contacto: "5492615320950" }
     ],
     "Consejo": [{ nombre: "Ganem Victoria", contacto: "5492615513444" }],
     "Funsad": [{ nombre: "Ganem Victoria", contacto: "549261551344" }],
-    "Lobby": [{ nombre: "Sanchez Alejandro", contacto: "5492615158389" },
-              { nombre: "Ganem Victoria", contacto: "549261551344" },
-              { nombre: "Escudero Carina", contacto: "5492615320950" }],
+    "Lobby": [
+        { nombre: "Sanchez Alejandro", contacto: "5492615158389" },
+        { nombre: "Ganem Victoria", contacto: "549261551344" },
+        { nombre: "Escudero Carina", contacto: "5492615320950" }
+    ],
     "Operador Logistico nave 2": [
         { nombre: "Constantino Adriana", contacto: "5492615320950" },
         { nombre: "Valdez Liliana", contacto: "5492616757808" }
@@ -49,12 +45,11 @@ const maestroSectores = {
         { nombre: "Reina Julia", contacto: "5492615320950" },
         { nombre: "Sepulveda Marcela", contacto: "5492615320950" },
         { nombre: "Sanabria Juan", contacto: "5492615320950" },
-        { nombre: "Perez Agustin", contacto: "5492615320950"}
+        { nombre: "Perez Agustin", contacto: "5492615320950" }
     ],
     "Cajas": [
         { nombre: "Arce José", contacto: "5492615320950" },
         { nombre: "Ponce Matias", contacto: "5492615320950" }
-       
     ],
     "Administración osep": [
         { nombre: "Pelayes Sergio", contacto: "5492615320950" },
@@ -74,265 +69,238 @@ const maestroSectores = {
     "Recepción Nave 2": [
         { nombre: "Moran Federico", contacto: "N/A" },
         { nombre: "Montenegro Victor", contacto: "N/A" },
-        {nombre: "Herrera Luis" , contacto: "N/A" }],
-        "Créditos": [
+        { nombre: "Herrera Luis", contacto: "N/A" }
+    ],
+    "Créditos": [
         { nombre: "Rovatti Dario", contacto: "5492615320950" },
         { nombre: "Agüero Rocio", contacto: "N/A" },
-        {nombre: "Andreoni Anabela" , contacto: "N/A" }],
+        { nombre: "Andreoni Anabela", contacto: "N/A" }
+    ],
     "Sistemas": [
         { nombre: "Lujan Omar", contacto: "5492615320950" },
         { nombre: "Puebla Adrian", contacto: "5492615320950" },
-        {nombre: "Placci Martin" , contacto: "5492615320950" }],
-      "Devolución a Proveedor y/o donaciones": [
-        { nombre: "Alvarez Cecilia", contacto: "5492615320950" }],
-    "Evento": [{ nombre: "Evento", contacto: "N/A" }],
+        { nombre: "Placci Martin", contacto: "5492615320950" }
+    ],
+    "Devolución a Proveedor y/o donaciones": [{ nombre: "Alvarez Cecilia", contacto: "5492615320950" }],
+    "EVENTO": [{ nombre: "EVENTO", contacto: "N/A" }],
     "Recepcion Técnica": [
         { nombre: "Daniel Ríos", contacto: "5492615320950" },
         { nombre: "Cecilia Nadal", contacto: "5492615320950" },
         { nombre: "Carina Escudero", contacto: "5492615320950" },
-        { nombre: "Natalia Bustos", contacto: "5492612128450" },
-        { nombre: "Jennifer Agüero", contacto: "5492615320950" }
-    ],
-    "Mantenimiento": [{ nombre: "Marsollier Ivan", contacto: "5492615320950" },
-                      { nombre: "Brizuela Tomas", contacto:"5492615320950"}],
-    "Guardia": [{ nombre: "Puesto 1", contacto: "5492615320950" }],
-    "EVENTO": [{ nombre: "EVENTO", contacto: "N/A" }]
+        { nombre: "Natalia Bustos", contacto: "5492612128450" }
+    ]
 };
 
- const escaneoRawInput = document.getElementById('escaneoRaw');
-const datosPersonalesInput = document.getElementById('datosPersonales');
-const empresaInput = document.getElementById('empresa');
-const sectorSelect = document.getElementById('sector');
-const anfitrionSelect = document.getElementById('anfitrion');
-const modoEventoCheck = document.getElementById('modoEvento');
-const groupEmpresa = document.getElementById('groupEmpresa');
-const btnRegistrar = document.getElementById('btnRegistrar');
-const btnLimpiar = document.getElementById('btnLimpiar');
-
-let timeoutAutoGuardar = null;
-
-// Foco automático para disparar con la pistola de hardware
-document.addEventListener('click', (evento) => {
-    const camposPermitidos = ['sector', 'anfitrion', 'observaciones', 'empresa', 'modoEvento'];
-    if (camposPermitidos.includes(evento.target.id) || evento.target.tagName === 'OPTION') {
-        return; 
+// Inicialización de selectores
+document.addEventListener('DOMContentLoaded', () => {
+    cargarSectores();
+    
+    // Evento para procesar el input directo del escáner
+    document.getElementById('escaneoRaw').addEventListener('change', function(e) {
+        procesarLectura(e.target.value);
+    });
+    
+    // Cargar nombre del evento si estaba guardado
+    const eventoPrevio = localStorage.getItem('nombreEventoFijo');
+    if(eventoPrevio) {
+        document.getElementById('nombreEvento').value = eventoPrevio;
     }
-    if (escaneoRawInput) escaneoRawInput.focus();
 });
 
-// Loaders dinámicos de selectores
 function cargarSectores() {
-    if (!sectorSelect) return;
-    sectorSelect.innerHTML = '<option value="">Seleccione un sector...</option>';
-    Object.keys(maestroSectores).forEach(sector => {
-        if(sector !== "EVENTO" || modoEventoCheck.checked) {
-            let option = document.createElement('option');
-            option.value = sector;
-            option.textContent = sector;
-            sectorSelect.appendChild(option);
-        }
+    const selectSector = document.getElementById('sector');
+    selectSector.innerHTML = '<option value="">Seleccione un sector...</option>';
+    
+    Object.keys(maestroSectores).forEach(sec => {
+        const option = document.createElement('option');
+        option.value = sec;
+        option.textContent = sec;
+        selectSector.appendChild(option);
     });
 }
 
-if (sectorSelect) {
-    sectorSelect.addEventListener('change', (e) => {
-        const sectorSeleccionado = e.target.value;
-        anfitrionSelect.innerHTML = '<option value="">Seleccione anfitrión...</option>';
+function actualizarAnfitriones() {
+    const sector = document.getElementById('sector').value;
+    const selectAnfitrion = document.getElementById('anfitrion');
+    selectAnfitrion.innerHTML = '<option value="">Seleccione anfitrión...</option>';
+
+    if (sector && maestroSectores[sector]) {
+        maestroSectores[sector].forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.nombre;
+            option.textContent = p.nombre;
+            selectAnfitrion.appendChild(option);
+        });
+    }
+}
+
+// Control de Modos
+function cambiarModoApp(modo) {
+    const body = document.body;
+    const groupBultos = document.getElementById('groupBultos');
+    const panelEvento = document.getElementById('panelEventoConfig');
+    const lblAnfitrion = document.getElementById('lblAnfitrion');
+    const inputEmpresa = document.getElementById('empresa');
+    const selectSector = document.getElementById('sector');
+    const selectAnfitrion = document.getElementById('anfitrion');
+    const inputObs = document.getElementById('observaciones');
+
+    body.className = '';
+
+    if (modo === 'mercadolibre') {
+        body.classList.add('modo-mercadolibre');
+        groupBultos.style.display = 'block';
+        panelEvento.style.display = 'none';
         
-        if (sectorSeleccionado && maestroSectores[sectorSeleccionado]) {
-            maestroSectores[sectorSeleccionado].forEach(anf => {
-                let option = document.createElement('option');
-                option.value = anf.nombre;
-                option.textContent = anf.nombre;
-                option.dataset.contacto = anf.contacto; 
-                anfitrionSelect.appendChild(option);
-            });
-            if(maestroSectores[sectorSeleccionado].length === 1) {
-                anfitrionSelect.selectedIndex = 1; 
-            }
+        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Propietario';
+        inputEmpresa.value = 'Mercado libre';
+        
+    } else if (modo === 'evento') {
+        body.classList.add('modo-evento');
+        groupBultos.style.display = 'none';
+        panelEvento.style.display = 'block';
+        
+        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión';
+        
+        // Selección por defecto para eventos
+        selectSector.value = 'EVENTO';
+        actualizarAnfitriones();
+        selectAnfitrion.value = 'EVENTO';
+        
+        const eventoGuardado = localStorage.getItem('nombreEventoFijo');
+        if (eventoGuardado) {
+            inputObs.value = eventoGuardado;
         }
-    });
+
+    } else { // Normal
+        body.classList.add('modo-normal');
+        groupBultos.style.display = 'none';
+        panelEvento.style.display = 'none';
+        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe';
+        inputEmpresa.value = '';
+    }
 }
 
-// =========================================================================
-// 4. SISTEMA DE LIMPIEZA Y DESARMADO DE DNI (@ / QR)
-// =========================================================================
-if (escaneoRawInput) {
-    escaneoRawInput.addEventListener('input', () => {
-        const rawText = escaneoRawInput.value.trim();
-        if (!rawText) return;
-
-        if (timeoutAutoGuardar) clearTimeout(timeoutAutoGuardar);
-
-        // Desarmado de DNI tarjeta de formato argentino
-        if (rawText.includes('@')) {
-            const partes = rawText.split('@');
-            if (partes.length >= 5) {
-                const apellido = partes[1].toUpperCase();
-                const nombre = partes[2].toUpperCase();
-                const dni = partes[4];
-                datosPersonalesInput.value = `${apellido}, ${nombre} - DNI: ${dni}`;
-            } else {
-                datosPersonalesInput.value = "FORMATO DNI NO RECONOCIDO";
-            }
-            if (!modoEventoCheck.checked) {
-                groupEmpresa.style.display = 'flex';
-                empresaInput.value = '';
-                empresaInput.focus();
-            }
-        } else {
-            // Desarmado de códigos QR con estructura predeterminada
-            const partes = rawText.split(' - ');
-            if (partes.length >= 3) {
-                datosPersonalesInput.value = partes[0].toUpperCase(); 
-                empresaInput.value = partes[2].toUpperCase();         
-                groupEmpresa.style.display = 'none';    
-            } else {
-                datosPersonalesInput.value = rawText.toUpperCase(); 
-            }
-        }
-
-        // Auto-guardado instantáneo en Modo Evento Masivo
-        if (modoEventoCheck.checked && datosPersonalesInput.value && !datosPersonalesInput.value.includes("NO RECONOCIDO")) {
-            timeoutAutoGuardar = setTimeout(() => {
-                if (btnRegistrar) btnRegistrar.click(); 
-            }, 200); 
-        }
-    });
+// Gestión de Nombre de Evento
+function guardarNombreEvento() {
+    const nombre = document.getElementById('nombreEvento').value;
+    if (nombre) {
+        localStorage.setItem('nombreEventoFijo', nombre);
+        document.getElementById('observaciones').value = nombre;
+        alert('Nombre del evento guardado correctamente.');
+    } else {
+        alert('Ingrese un nombre de evento válido.');
+    }
 }
 
-if (modoEventoCheck) {
-    modoEventoCheck.addEventListener('change', () => {
-        if (modoEventoCheck.checked) {
-            document.body.style.setProperty('--accent-blue', 'var(--accent-event)');
-            groupEmpresa.style.display = 'none';
-            empresaInput.value = "EVENTO";
-            cargarSectores();
-            sectorSelect.value = "EVENTO";
-            sectorSelect.dispatchEvent(new Event('change')); 
+function borrarNombreEvento() {
+    localStorage.removeItem('nombreEventoFijo');
+    document.getElementById('nombreEvento').value = '';
+    if (document.getElementById('modoApp').value === 'evento') {
+        document.getElementById('observaciones').value = '';
+    }
+}
+
+// Procesar lectura del PDF417 / DNI
+function procesarLectura(cadena) {
+    if (!cadena) return;
+    
+    let partes = cadena.split('"');
+    let datos = "";
+    
+    if (partes.length >= 5) {
+        let apellido = partes[1] || "";
+        let nombre = partes[2] || "";
+        let dni = partes[4] || "";
+        datos = `${apellido} ${nombre} - DNI: ${dni}`.trim();
+    } else {
+        partes = cadena.split('@');
+        if (partes.length >= 5) {
+            let apellido = partes[1] || "";
+            let nombre = partes[2] || "";
+            let dni = partes[4] || "";
+            datos = `${apellido} ${nombre} - DNI: ${dni}`.trim();
         } else {
-            document.body.style.setProperty('--accent-blue', '#0052cc');
-            groupEmpresa.style.display = 'flex';
-            limpiarFormulario();
+            datos = cadena;
         }
-        if (escaneoRawInput) escaneoRawInput.focus();
+    }
+    
+    document.getElementById('datosPersonales').value = datos;
+    document.getElementById('scannerStatus').textContent = 'Lectura correcta';
+}
+
+// Cámara QR
+function iniciarEscaneo() {
+    html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+            procesarLectura(decodedText);
+            html5QrCode.stop();
+        },
+        (errorMessage) => {}
+    ).catch(err => console.error(err));
+}
+
+// Registrar Ingreso (Envío a Google Apps Script)
+function registrarIngreso() {
+    const modo = document.getElementById('modoApp').value;
+    const datos = document.getElementById('datosPersonales').value;
+    const empresa = document.getElementById('empresa').value;
+    const sector = document.getElementById('sector').value;
+    const anfitrion = document.getElementById('anfitrion').value;
+    const cantidadBultos = document.getElementById('cantidadBultos').value;
+    const observaciones = document.getElementById('observaciones').value;
+
+    if (!datos || !sector || !anfitrion) {
+        alert('Complete los campos requeridos (Escaneo, Sector y Anfitrión).');
+        return;
+    }
+
+    const payload = {
+        modo: modo,
+        datosPersonales: datos,
+        empresa: empresa,
+        sector: sector,
+        anfitrion: anfitrion,
+        bultos: modo === 'mercadolibre' ? cantidadBultos : '',
+        observaciones: observaciones
+    };
+
+    fetch(URL_API_GOOGLE, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        alert('Ingreso registrado correctamente.');
+        limpiarFormulario();
+    })
+    .catch(error => {
+        console.error('Error al guardar:', error);
+        alert('Error al intentar registrar el ingreso.');
     });
 }
 
 function limpiarFormulario() {
-    if (escaneoRawInput) escaneoRawInput.value = '';
-    if (datosPersonalesInput) datosPersonalesInput.value = '';
-    if (!modoEventoCheck.checked) {
-        if (empresaInput) empresaInput.value = '';
-        if (sectorSelect) sectorSelect.value = '';
-        if (anfitrionSelect) anfitrionSelect.innerHTML = '<option value="">Seleccione anfitrión...</option>';
+    document.getElementById('escaneoRaw').value = '';
+    document.getElementById('datosPersonales').value = '';
+    document.getElementById('scannerStatus').textContent = 'Lector Listo';
+    
+    const modo = document.getElementById('modoApp').value;
+    if (modo !== 'mercadolibre') {
+        document.getElementById('empresa').value = '';
     }
-    const obsField = document.getElementById('observaciones');
-    if (obsField) obsField.value = '';
-    if (escaneoRawInput) escaneoRawInput.focus();
-}
-
-if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarFormulario);
-
-// Escaneo por medio de la lente de la cámara del celular
-async function iniciarEscaneo() {
-    if (html5QrCode.isScanning) return;
-    try {
-        await html5QrCode.start(
-            { facingMode: "environment" },
-            { 
-                fps: 20, 
-                // Subimos a 240 para que el DNI entre un poco más cómodo pero siga estando cerca
-                qrbox: { width: 240, height: 240 }, 
-                videoConstraints: {
-                    facingMode: "environment",
-                    // Dejamos un rango estándar para que no tire errores de hardware
-                    width: { min: 640, ideal: 1280 },
-                    height: { min: 480, ideal: 720 }
-                }
-            },
-            (decodedText) => {
-                if (escaneoRawInput) {
-                    escaneoRawInput.value = decodedText;
-                    escaneoRawInput.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-                html5QrCode.stop();
-            },
-            (errorMessage) => {
-                // Dejar vacío para que los reniegos internos de la cámara no molesten en la pantalla
-            }
-        );
-
-        // Intenta aplicar el zoom si la cámara elegida lo soporta
-        const videoTrack = html5QrCode.getRunningTrack();
-        setTimeout(() => {
-            if (videoTrack) {
-                const capabilities = videoTrack.getCapabilities();
-                if (capabilities.zoom) {
-                    videoTrack.applyConstraints({
-                        advanced: [{ zoom: 2.0 }] 
-                    }).catch(err => console.log("Zoom no soportado en esta cámara de respaldo"));
-                }
-            }
-        }, 650); 
-
-    } catch (err) {
-        // Guardamos el error silenciosamente en la consola del navegador en vez de romper con un alert
-        console.log("Aviso de inicio de cámara: ", err);
+    if (modo !== 'evento') {
+        document.getElementById('sector').value = '';
+        document.getElementById('anfitrion').value = '';
+        document.getElementById('observaciones').value = '';
+    } else {
+        const eventoGuardado = localStorage.getItem('nombreEventoFijo');
+        document.getElementById('observaciones').value = eventoGuardado || '';
     }
+    
+    document.getElementById('cantidadBultos').value = '1';
+    document.getElementById('escaneoRaw').focus();
 }
-
-// =========================================================================
-// 5. EVENTO REGISTRAR - ENVÍO SEGURO DIRECTO A GOOGLE SCRIPT (NO-CORS)
-// =========================================================================
-if (btnRegistrar) {
-    btnRegistrar.addEventListener('click', async () => {
-        if (!datosPersonalesInput.value || !sectorSelect.value || !anfitrionSelect.value) {
-            alert('Por favor, complete los campos obligatorios antes de registrar.');
-            return;
-        }
-
-        const selectedOption = anfitrionSelect.options[anfitrionSelect.selectedIndex];
-        const nroContacto = selectedOption ? selectedOption.dataset.contacto : '5492615320950';
-        const obsElement = document.getElementById('observaciones');
-        const observacionesTexto = obsElement && obsElement.value ? obsElement.value.toUpperCase() : 'SIN OBSERVACIONES';
-        
-        // Empaquetamos en minúsculas tal cual lo requiere tu script del Excel
-        const datosObj = {
-            "datosPersonales": datosPersonalesInput.value.toUpperCase(),
-            "empresa": (empresaInput.value || "VISITA").toUpperCase(),
-            "sector": sectorSelect.value.toUpperCase(),
-            "anfitrion": anfitrionSelect.value.toUpperCase(),
-            "observaciones": observacionesTexto,
-            "modoEvento": modoEventoCheck.checked // Envía true o false
-        };
-
-        try {
-            // Enviamos como text/plain con mode: no-cors para saltar bloqueos de red
-            await fetch(URL_API_GOOGLE, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-                body: JSON.stringify(datosObj)
-            });
-
-            // Al no saltar al catch, el registro fue insertado con éxito en tu Google Sheets
-            alert("✅ Registro enviado a la hoja de cálculo con éxito.");
-
-          
-
-            limpiarFormulario();
-
-        } catch (error) {
-            console.error("Error crítico de red:", error);
-            alert("❌ Error de red. No se pudo conectar con la base de datos de Google.");
-        }
-    });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    cargarSectores();
-    if (escaneoRawInput) escaneoRawInput.focus();
-});
