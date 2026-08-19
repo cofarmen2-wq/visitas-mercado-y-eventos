@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
-<body>
+<body class="modo-normal"> <!-- Se aplicará la clase del modo dinámicamente -->
     <div class="app-container">
         <header class="app-header">
             <div class="logo-container">
@@ -19,31 +19,41 @@
                 </div>
             </div>
             
-            <div class="event-switch-container">
-                <label class="switch-label">
-                    <i class="fa-solid fa-users"></i> ¿Modo Evento Masivo?
-                </label>
-                <label class="switch">
-                    <input type="checkbox" id="modoEvento">
-                    <span class="slider round"></span>
-                </label>
+            <!-- Selector de Modos -->
+            <div class="mode-select-container">
+                <label for="modoApp"><i class="fa-solid fa-sliders"></i> Modo Operación:</label>
+                <select id="modoApp" onchange="cambiarModoApp(this.value)">
+                    <option value="normal">Normal</option>
+                    <option value="mercadolibre">Mercado Libre</option>
+                    <option value="evento">Evento Masivo</option>
+                </select>
             </div>
         </header>
 
         <main class="main-content">
             <form id="formVisita" autocomplete="off" onsubmit="event.preventDefault();">
-                
                 <div class="scanner-input-container">
                     <label for="escaneoRaw"><i class="fa-solid fa-qrcode"></i> Esperando Escaneo (DNI o QR)...</label>
                     <input type="text" id="escaneoRaw" placeholder="Haga clic aquí y escanee..." autofocus required>
                     <span class="scanner-status" id="scannerStatus">Lector Listo</span>
                 </div>
-                <button class="btn-qr" onclick="iniciarEscaneo()">📸 Escanear QR</button>
-<div id="reader"></div>
+
+                <button type="button" class="btn-qr" onclick="iniciarEscaneo()">📸 Escanear QR</button>
+                <div id="reader"></div>
+
+                <!-- Panel de Configuración para Modo Evento -->
+                <div id="panelEventoConfig" class="event-config-panel" style="display: none;">
+                    <label for="nombreEvento"><i class="fa-solid fa-calendar-day"></i> Nombre del Evento Fijo:</label>
+                    <div class="event-input-group">
+                        <input type="text" id="nombreEvento" placeholder="Ej: Convención Anual 2026">
+                        <button type="button" id="btnGuardarEvento" onclick="guardarNombreEvento()" class="btn-small btn-save">💾 Fijar</button>
+                        <button type="button" id="btnBorrarEvento" onclick="borrarNombreEvento()" class="btn-small btn-danger">🗑️ Borrar</button>
+                    </div>
+                </div>
 
                 <div class="form-grid">
                     <div class="form-group full-width">
-                        <label><i class="fa-solid fa-user"></i> Datos Personales</label>
+                        <label><i class="fa-solid fa-user"></i> Datos Personales / Transportista</label>
                         <input type="text" id="datosPersonales" readonly placeholder="Apellido, Nombre y DNI (Automático)">
                     </div>
 
@@ -60,10 +70,16 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="anfitrion"><i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe</label>
+                        <label for="anfitrion" id="lblAnfitrion"><i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe</label>
                         <select id="anfitrion" required>
                             <option value="">Seleccione anfitrión...</option>
                         </select>
+                    </div>
+
+                    <!-- Campo Adicional para Modo Mercado Libre -->
+                    <div class="form-group" id="groupBultos" style="display: none;">
+                        <label for="cantidadBultos"><i class="fa-solid fa-boxes-stacked"></i> Cantidad de Bultos</label>
+                        <input type="number" id="cantidadBultos" min="1" placeholder="Ej: 5">
                     </div>
 
                     <div class="form-group full-width">
@@ -76,23 +92,16 @@
                     <button type="button" id="btnRegistrar" class="btn-submit">
                         <i class="fa-solid fa-circle-check"></i> Registrar Ingreso
                     </button>
-                    <button type="button" id="btnLimpiar" class="btn-secondary">
-                        Limpiar Todo
-                    </button>
+                    <button type="button" id="btnLimpiar" class="btn-secondary">Limpiar Todo</button>
                 </div>
             </form>
         </main>
     </div>
-    
+
+    <button id="btnWhatsApp" class="btn-whatsapp" style="display:none; background-color: #25d366; color: white; margin-top: 15px;">
+        🚀 Enviar WhatsApp
+    </button>
 
     <script src="app.js"></script>
-</body>
-</html>
-    <button id="btnWhatsApp" class="btn-whatsapp" style="display:none; background-color: #25d366; color: white; margin-top: 15px;">
-    🚀 Enviar WhatsApp
-</button>
-</div>
-
-<script src="https://unpkg.com/html5-qrcode"></script>
 </body>
 </html>
