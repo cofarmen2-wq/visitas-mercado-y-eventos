@@ -1,7 +1,14 @@
+/ =========================================================================
+const html5QrCode = new Html5Qrcode("reader");
+
+const URL_API_GOOGLE = 'https://script.google.com/macros/s/AKfycbxeRqX9w4SUUu2yGzNre3hVAr-RGTxXO8_rZCxUcOWe9G376fqhlIS43c45-SvanGni/exec';
+
 // =========================================================================
 const html5QrCode = new Html5Qrcode("reader");
 
 const URL_API_GOOGLE = 'https://script.google.com/macros/s/AKfycbxeRqX9w4SUUu2yGzNre3hVAr-RGTxXO8_rZCxUcOWe9G376fqhlIS43c45-SvanGni/exec';
+
+let contactoAnfitrionActual = "";
 
 const maestroSectores = {
     "Mostrador": [{ nombre: "Atención Mostrador", contacto: "N/A" }],
@@ -91,18 +98,21 @@ const maestroSectores = {
     ]
 };
 
-// Inicialización de selectores
+// Inicialización de selectores y listeners
 document.addEventListener('DOMContentLoaded', () => {
     cargarSectores();
-    
-    // Evento para procesar el input directo del escáner
+
     document.getElementById('escaneoRaw').addEventListener('change', function(e) {
         procesarLectura(e.target.value);
     });
-    
-    // Cargar nombre del evento si estaba guardado
+
+    document.getElementById('anfitrion').addEventListener('change', function(e) {
+        const selectedOption = e.target.options[e.target.selectedIndex];
+        contactoAnfitrionActual = selectedOption ? (selectedOption.dataset.contacto || "N/A") : "";
+    });
+
     const eventoPrevio = localStorage.getItem('nombreEventoFijo');
-    if(eventoPrevio) {
+    if (eventoPrevio) {
         document.getElementById('nombreEvento').value = eventoPrevio;
     }
 });
@@ -110,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function cargarSectores() {
     const selectSector = document.getElementById('sector');
     selectSector.innerHTML = '<option value="">Seleccione un sector...</option>';
-    
     Object.keys(maestroSectores).forEach(sec => {
         const option = document.createElement('option');
         option.value = sec;
@@ -129,6 +138,7 @@ function actualizarAnfitriones() {
             const option = document.createElement('option');
             option.value = p.nombre;
             option.textContent = p.nombre;
+            option.dataset.contacto = p.contacto;
             selectAnfitrion.appendChild(option);
         });
     }
@@ -136,6 +146,7 @@ function actualizarAnfitriones() {
 
 // Control de Modos
 function cambiarModoApp(modo) {
+    const html = document.documentElement;
     const body = document.body;
     const groupBultos = document.getElementById('groupBultos');
     const panelEvento = document.getElementById('panelEventoConfig');
@@ -144,44 +155,43 @@ function cambiarModoApp(modo) {
     const selectSector = document.getElementById('sector');
     const selectAnfitrion = document.getElementById('anfitrion');
     const inputObs = document.getElementById('observaciones');
+    const btnWA = document.getElementById('btnWhatsApp');
 
-    body.className = '';
+    // Forzar cambio de clase tanto en html como en body para asegurar el color de fondo en APK/WebView
+    html.className = 'modo-' + modo;
+    body.className = 'modo-' + modo;
 
     if (modo === 'mercadolibre') {
-        body.classList.add('modo-mercadolibre');
         groupBultos.style.display = 'block';
         panelEvento.style.display = 'none';
-        
         lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Propietario';
         inputEmpresa.value = 'Mercado libre';
-        
+        btnWA.style.display = 'none';
+
     } else if (modo === 'evento') {
-        body.classList.add('modo-evento');
         groupBultos.style.display = 'none';
         panelEvento.style.display = 'block';
-        
         lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión';
-        
-        // Selección por defecto para eventos
+        inputEmpresa.value = 'Visita'; // Corrección de valor predeterminado
+
         selectSector.value = 'EVENTO';
         actualizarAnfitriones();
         selectAnfitrion.value = 'EVENTO';
-        
+
         const eventoGuardado = localStorage.getItem('nombreEventoFijo');
-        if (eventoGuardado) {
-            inputObs.value = eventoGuardado;
-        }
+        if (eventoGuardado) inputObs.value = eventoGuardado;
+        btnWA.style.display = 'none';
 
     } else { // Normal
-        body.classList.add('modo-normal');
         groupBultos.style.display = 'none';
         panelEvento.style.display = 'none';
         lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe';
         inputEmpresa.value = '';
+        btnWA.style.display = 'none';
     }
 }
 
-// Gestión de Nombre de Evento
+// Gestión de Evento Fijo
 function guardarNombreEvento() {
     const nombre = document.getElementById('nombreEvento').value;
     if (nombre) {
@@ -201,13 +211,12 @@ function borrarNombreEvento() {
     }
 }
 
-// Procesar lectura del PDF417 / DNI
+// Lectura de Código (DNI / QR)
 function procesarLectura(cadena) {
     if (!cadena) return;
-    
     let partes = cadena.split('"');
     let datos = "";
-    
+
     if (partes.length >= 5) {
         let apellido = partes[1] || "";
         let nombre = partes[2] || "";
@@ -224,12 +233,11 @@ function procesarLectura(cadena) {
             datos = cadena;
         }
     }
-    
+
     document.getElementById('datosPersonales').value = datos;
     document.getElementById('scannerStatus').textContent = 'Lectura correcta';
 }
 
-// Cámara QR
 function iniciarEscaneo() {
     html5QrCode.start(
         { facingMode: "environment" },
@@ -242,7 +250,24 @@ function iniciarEscaneo() {
     ).catch(err => console.error(err));
 }
 
-// Registrar Ingreso (Envío a Google Apps Script)
+// WhatsApp
+function enviarWhatsApp() {
+    const datos = document.getElementById('datosPersonales').value;
+    const empresa = document.getElementById('empresa').value;
+    const sector = document.getElementById('sector').value;
+    const anfitrion = document.getElementById('anfitrion').value;
+
+    if (!contactoAnfitrionActual || contactoAnfitrionActual === "N/A") {
+        alert("El anfitrión seleccionado no tiene un número de contacto válido.");
+        return;
+    }
+
+    const mensaje = `*Aviso de Visita - COFARMEN*\n\nHola *${anfitrion}*, se ha registrado el ingreso de:\n👤 *Persona:* ${datos}\n🏢 *Empresa:* ${empresa}\n📍 *Sector:* ${sector}`;
+    const urlWA = `https://api.whatsapp.com/send?phone=${contactoAnfitrionActual}&text=${encodeURIComponent(mensaje)}`;
+    window.open(urlWA, '_blank');
+}
+
+// Registro
 function registrarIngreso() {
     const modo = document.getElementById('modoApp').value;
     const datos = document.getElementById('datosPersonales').value;
@@ -275,7 +300,13 @@ function registrarIngreso() {
     })
     .then(() => {
         alert('Ingreso registrado correctamente.');
-        limpiarFormulario();
+
+        if (contactoAnfitrionActual && contactoAnfitrionActual !== "N/A") {
+            document.getElementById('btnWhatsApp').style.display = 'block';
+            enviarWhatsApp();
+        } else {
+            limpiarFormulario();
+        }
     })
     .catch(error => {
         console.error('Error al guardar:', error);
@@ -287,7 +318,7 @@ function limpiarFormulario() {
     document.getElementById('escaneoRaw').value = '';
     document.getElementById('datosPersonales').value = '';
     document.getElementById('scannerStatus').textContent = 'Lector Listo';
-    
+
     const modo = document.getElementById('modoApp').value;
     if (modo !== 'mercadolibre') {
         document.getElementById('empresa').value = '';
@@ -300,116 +331,7 @@ function limpiarFormulario() {
         const eventoGuardado = localStorage.getItem('nombreEventoFijo');
         document.getElementById('observaciones').value = eventoGuardado || '';
     }
-    
+
     document.getElementById('cantidadBultos').value = '1';
     document.getElementById('escaneoRaw').focus();
-}
-let contactoAnfitrionActual = "";
-
-function actualizarAnfitriones() {
-    const sector = document.getElementById('sector').value;
-    const selectAnfitrion = document.getElementById('anfitrion');
-    selectAnfitrion.innerHTML = '<option value="">Seleccione anfitrión...</option>';
-
-    if (sector && maestroSectores[sector]) {
-        maestroSectores[sector].forEach(p => {
-            const option = document.createElement('option');
-            option.value = p.nombre;
-            option.textContent = p.nombre;
-            option.dataset.contacto = p.contacto;
-            selectAnfitrion.appendChild(option);
-        });
-    }
-}
-
-// Escuchar selección de anfitrión para guardar su número
-document.getElementById('anfitrion').addEventListener('change', function(e) {
-    const selectedOption = e.target.options[e.target.selectedIndex];
-    contactoAnfitrionActual = selectedOption ? selectedOption.dataset.contacto : "";
-});
-
-function cambiarModoApp(modo) {
-    const body = document.body;
-    const html = document.documentElement;
-    const groupBultos = document.getElementById('groupBultos');
-    const panelEvento = document.getElementById('panelEventoConfig');
-    const lblAnfitrion = document.getElementById('lblAnfitrion');
-    const inputEmpresa = document.getElementById('empresa');
-    const selectSector = document.getElementById('sector');
-    const selectAnfitrion = document.getElementById('anfitrion');
-    const inputObs = document.getElementById('observaciones');
-    const btnWA = document.getElementById('btnWhatsApp');
-
-    // Aplicación de clases en HTML y BODY para compatibilidad total con WebView/APK
-    html.className = 'modo-' + modo;
-    body.className = 'modo-' + modo;
-
-    if (modo === 'mercadolibre') {
-        groupBultos.style.display = 'block';
-        panelEvento.style.display = 'none';
-        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Propietario';
-        inputEmpresa.value = 'Mercado libre';
-        btnWA.style.display = 'none';
-        
-    } else if (modo === 'evento') {
-        groupBultos.style.display = 'none';
-        panelEvento.style.display = 'block';
-        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión';
-        inputEmpresa.value = 'Visita';
-        
-        selectSector.value = 'EVENTO';
-        actualizarAnfitriones();
-        selectAnfitrion.value = 'EVENTO';
-        
-        const eventoGuardado = localStorage.getItem('nombreEventoFijo');
-        if (eventoGuardado) inputObs.value = eventoGuardado;
-        btnWA.style.display = 'none';
-
-    } else { // Normal
-        groupBultos.style.display = 'none';
-        panelEvento.style.display = 'none';
-        lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe';
-        inputEmpresa.value = '';
-        btnWA.style.display = 'none';
-    }
-}
-
-// Función para abrir WhatsApp Web/App
-function enviarWhatsApp() {
-    const datos = document.getElementById('datosPersonales').value;
-    const empresa = document.getElementById('empresa').value;
-    const sector = document.getElementById('sector').value;
-    const anfitrion = document.getElementById('anfitrion').value;
-
-    if (!contactoAnfitrionActual || contactoAnfitrionActual === "N/A") {
-        alert("El anfitrión seleccionado no tiene un número de contacto válido.");
-        return;
-    }
-
-    const mensaje = `*Aviso de Visita - COFARMEN*\n\nHola *${anfitrion}*, se ha registrado el ingreso de:\n👤 *Persona:* ${datos}\n🏢 *Empresa:* ${empresa}\n📍 *Sector:* ${sector}`;
-    const urlWA = `https://api.whatsapp.com/send?phone=${contactoAnfitrionActual}&text=${encodeURIComponent(mensaje)}`;
-    
-    window.open(urlWA, '_blank');
-}
-
-// Al registrar exitosamente, mostrar/abrir WhatsApp si aplica
-function registrarIngreso() {
-    // ... Código de registro previo ...
-    fetch(URL_API_GOOGLE, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-    .then(() => {
-        alert('Ingreso registrado correctamente.');
-        
-        // Si hay un contacto válido, muestra el botón y permite enviar
-        if (contactoAnfitrionActual && contactoAnfitrionActual !== "N/A") {
-            document.getElementById('btnWhatsApp').style.display = 'block';
-            enviarWhatsApp(); // Envío automático
-        } else {
-            limpiarFormulario();
-        }
-    });
 }
