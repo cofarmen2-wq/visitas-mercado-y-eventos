@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="modo-normal">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
-<body class="modo-normal"> <!-- Se aplicará la clase del modo dinámicamente -->
+<body class="modo-normal">
     <div class="app-container">
         <header class="app-header">
             <div class="logo-container">
@@ -19,7 +19,6 @@
                 </div>
             </div>
             
-            <!-- Selector de Modos -->
             <div class="mode-select-container">
                 <label for="modoApp"><i class="fa-solid fa-sliders"></i> Modo Operación:</label>
                 <select id="modoApp" onchange="cambiarModoApp(this.value)">
@@ -31,6 +30,16 @@
         </header>
 
         <main class="main-content">
+            <!-- Barra de Configuración de Nombre de Evento -->
+            <div id="panelEventoConfig" class="event-config-panel" style="display: none;">
+                <label for="nombreEvento"><i class="fa-solid fa-calendar-day"></i> Nombre del Evento Fijo:</label>
+                <div class="event-input-group">
+                    <input type="text" id="nombreEvento" placeholder="Ej: Convención Anual 2026">
+                    <button type="button" id="btnGuardarEvento" onclick="guardarNombreEvento()" class="btn-small btn-save">💾 Fijar</button>
+                    <button type="button" id="btnBorrarEvento" onclick="borrarNombreEvento()" class="btn-small btn-danger">🗑️ Borrar</button>
+                </div>
+            </div>
+
             <form id="formVisita" autocomplete="off" onsubmit="event.preventDefault();">
                 <div class="scanner-input-container">
                     <label for="escaneoRaw"><i class="fa-solid fa-qrcode"></i> Esperando Escaneo (DNI o QR)...</label>
@@ -40,16 +49,6 @@
 
                 <button type="button" class="btn-qr" onclick="iniciarEscaneo()">📸 Escanear QR</button>
                 <div id="reader"></div>
-
-                <!-- Panel de Configuración para Modo Evento -->
-                <div id="panelEventoConfig" class="event-config-panel" style="display: none;">
-                    <label for="nombreEvento"><i class="fa-solid fa-calendar-day"></i> Nombre del Evento Fijo:</label>
-                    <div class="event-input-group">
-                        <input type="text" id="nombreEvento" placeholder="Ej: Convención Anual 2026">
-                        <button type="button" id="btnGuardarEvento" onclick="guardarNombreEvento()" class="btn-small btn-save">💾 Fijar</button>
-                        <button type="button" id="btnBorrarEvento" onclick="borrarNombreEvento()" class="btn-small btn-danger">🗑️ Borrar</button>
-                    </div>
-                </div>
 
                 <div class="form-grid">
                     <div class="form-group full-width">
@@ -64,7 +63,7 @@
 
                     <div class="form-group">
                         <label for="sector"><i class="fa-solid fa-map-location-dot"></i> Sector a Visitar</label>
-                        <select id="sector" required>
+                        <select id="sector" required onchange="actualizarAnfitriones()">
                             <option value="">Seleccione un sector...</option>
                         </select>
                     </div>
@@ -76,10 +75,10 @@
                         </select>
                     </div>
 
-                    <!-- Campo Adicional para Modo Mercado Libre -->
+                    <!-- Columna H: Cantidad de bultos (Mercado libre) -->
                     <div class="form-group" id="groupBultos" style="display: none;">
                         <label for="cantidadBultos"><i class="fa-solid fa-boxes-stacked"></i> Cantidad de Bultos</label>
-                        <input type="number" id="cantidadBultos" min="1" placeholder="Ej: 5">
+                        <input type="number" id="cantidadBultos" min="1" value="1" placeholder="Ej: 1, 2, 5...">
                     </div>
 
                     <div class="form-group full-width">
@@ -89,18 +88,21 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" id="btnRegistrar" class="btn-submit">
+                    <button type="button" id="btnRegistrar" onclick="registrarIngreso()" class="btn-submit">
                         <i class="fa-solid fa-circle-check"></i> Registrar Ingreso
                     </button>
-                    <button type="button" id="btnLimpiar" class="btn-secondary">Limpiar Todo</button>
+                    <button type="button" id="btnLimpiar" onclick="limpiarFormulario()" class="btn-secondary">Limpiar Campos</button>
                 </div>
             </form>
         </main>
     </div>
 
-    <button id="btnWhatsApp" class="btn-whatsapp" style="display:none; background-color: #25d366; color: white; margin-top: 15px;">
-        🚀 Enviar WhatsApp
-    </button>
+    <!-- Botón de Envío por WhatsApp -->
+    <div class="whatsapp-container">
+        <button type="button" id="btnWhatsApp" onclick="enviarWhatsApp()" class="btn-whatsapp" style="display: none;">
+            <i class="fa-brands fa-whatsapp"></i> Enviar WhatsApp al Anfitrión
+        </button>
+    </div>
 
     <script src="app.js"></script>
 </body>
