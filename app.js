@@ -82,6 +82,9 @@ const maestroSectores = {
         { nombre: "Puebla Adrian", contacto: "5492615320950" },
         { nombre: "Placci Martin", contacto: "5492615320950" }
     ],
+     "Guardia": [
+        { nombre: "seguridad", contacto: "5492615320950" }
+    ],
     "Devolución a Proveedor y/o donaciones": [{ nombre: "Alvarez Cecilia", contacto: "5492615320950" }],
     "EVENTO": [{ nombre: "EVENTO", contacto: "N/A" }],
     "Recepcion Técnica": [
