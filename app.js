@@ -1,4 +1,3 @@
-// =========================================================================
 const html5QrCode = new Html5Qrcode("reader");
 
 const URL_API_GOOGLE = 'https://script.google.com/macros/s/AKfycbxeRqX9w4SUUu2yGzNre3hVAr-RGTxXO8_rZCxUcOWe9G376fqhlIS43c45-SvanGni/exec';
@@ -93,23 +92,18 @@ const maestroSectores = {
     ]
 };
 
-// Inicialización de selectores y listeners
 document.addEventListener('DOMContentLoaded', () => {
     cargarSectores();
 
-    document.getElementById('escaneoRaw').addEventListener('change', function(e) {
-        procesarLectura(e.target.value);
-    });
+    document.getElementById('escaneoRaw').addEventListener('change', (e) => procesarLectura(e.target.value));
 
-    document.getElementById('anfitrion').addEventListener('change', function(e) {
+    document.getElementById('anfitrion').addEventListener('change', (e) => {
         const selectedOption = e.target.options[e.target.selectedIndex];
         contactoAnfitrionActual = selectedOption ? (selectedOption.dataset.contacto || "N/A") : "";
     });
 
-    const eventoPrevio = localStorage.getItem('nombreEventoFijo');
-    if (eventoPrevio) {
-        document.getElementById('nombreEvento').value = eventoPrevio;
-    }
+    const modoInicial = document.getElementById('modoApp').value;
+    cambiarModoApp(modoInicial);
 });
 
 function cargarSectores() {
@@ -139,10 +133,11 @@ function actualizarAnfitriones() {
     }
 }
 
-// Control de Modos
+// Función principal de cambio de modo
 function cambiarModoApp(modo) {
-    const html = document.documentElement;
+    const root = document.documentElement;
     const body = document.body;
+    const container = document.querySelector('.app-container');
     const groupBultos = document.getElementById('groupBultos');
     const panelEvento = document.getElementById('panelEventoConfig');
     const lblAnfitrion = document.getElementById('lblAnfitrion');
@@ -152,9 +147,15 @@ function cambiarModoApp(modo) {
     const inputObs = document.getElementById('observaciones');
     const btnWA = document.getElementById('btnWhatsApp');
 
-    // Forzar cambio de clase tanto en html como en body para asegurar el color de fondo en APK/WebView
-    html.className = 'modo-' + modo;
-    body.className = 'modo-' + modo;
+    // Remover clases anteriores
+    root.className = '';
+    body.className = '';
+    container.className = 'app-container';
+
+    // Aplicar clase nueva
+    root.classList.add('modo-' + modo);
+    body.classList.add('modo-' + modo);
+    container.classList.add('modo-' + modo);
 
     if (modo === 'mercadolibre') {
         groupBultos.style.display = 'block';
@@ -167,14 +168,17 @@ function cambiarModoApp(modo) {
         groupBultos.style.display = 'none';
         panelEvento.style.display = 'block';
         lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión';
-        inputEmpresa.value = 'Visita'; // Corrección de valor predeterminado
+        inputEmpresa.value = 'Visita';
 
         selectSector.value = 'EVENTO';
         actualizarAnfitriones();
         selectAnfitrion.value = 'EVENTO';
 
         const eventoGuardado = localStorage.getItem('nombreEventoFijo');
-        if (eventoGuardado) inputObs.value = eventoGuardado;
+        if (eventoGuardado) {
+            document.getElementById('nombreEvento').value = eventoGuardado;
+            inputObs.value = eventoGuardado;
+        }
         btnWA.style.display = 'none';
 
     } else { // Normal
@@ -186,15 +190,14 @@ function cambiarModoApp(modo) {
     }
 }
 
-// Gestión de Evento Fijo
 function guardarNombreEvento() {
     const nombre = document.getElementById('nombreEvento').value;
     if (nombre) {
         localStorage.setItem('nombreEventoFijo', nombre);
         document.getElementById('observaciones').value = nombre;
-        alert('Nombre del evento guardado correctamente.');
+        alert('Nombre del evento fijado correctamente.');
     } else {
-        alert('Ingrese un nombre de evento válido.');
+        alert('Ingrese un nombre para el evento.');
     }
 }
 
@@ -206,31 +209,24 @@ function borrarNombreEvento() {
     }
 }
 
-// Lectura de Código (DNI / QR)
 function procesarLectura(cadena) {
     if (!cadena) return;
     let partes = cadena.split('"');
     let datos = "";
 
     if (partes.length >= 5) {
-        let apellido = partes[1] || "";
-        let nombre = partes[2] || "";
-        let dni = partes[4] || "";
-        datos = `${apellido} ${nombre} - DNI: ${dni}`.trim();
+        datos = `${partes[1] || ""} ${partes[2] || ""} - DNI: ${partes[4] || ""}`.trim();
     } else {
         partes = cadena.split('@');
         if (partes.length >= 5) {
-            let apellido = partes[1] || "";
-            let nombre = partes[2] || "";
-            let dni = partes[4] || "";
-            datos = `${apellido} ${nombre} - DNI: ${dni}`.trim();
+            datos = `${partes[1] || ""} ${partes[2] || ""} - DNI: ${partes[4] || ""}`.trim();
         } else {
             datos = cadena;
         }
     }
 
     document.getElementById('datosPersonales').value = datos;
-    document.getElementById('scannerStatus').textContent = 'Lectura correcta';
+    document.getElementById('scannerStatus').textContent = 'Lectura realizada';
 }
 
 function iniciarEscaneo() {
@@ -241,11 +237,10 @@ function iniciarEscaneo() {
             procesarLectura(decodedText);
             html5QrCode.stop();
         },
-        (errorMessage) => {}
+        () => {}
     ).catch(err => console.error(err));
 }
 
-// WhatsApp
 function enviarWhatsApp() {
     const datos = document.getElementById('datosPersonales').value;
     const empresa = document.getElementById('empresa').value;
@@ -253,16 +248,14 @@ function enviarWhatsApp() {
     const anfitrion = document.getElementById('anfitrion').value;
 
     if (!contactoAnfitrionActual || contactoAnfitrionActual === "N/A") {
-        alert("El anfitrión seleccionado no tiene un número de contacto válido.");
+        alert("El anfitrión no posee número registrado.");
         return;
     }
 
-    const mensaje = `*Aviso de Visita - COFARMEN*\n\nHola *${anfitrion}*, se ha registrado el ingreso de:\n👤 *Persona:* ${datos}\n🏢 *Empresa:* ${empresa}\n📍 *Sector:* ${sector}`;
-    const urlWA = `https://api.whatsapp.com/send?phone=${contactoAnfitrionActual}&text=${encodeURIComponent(mensaje)}`;
-    window.open(urlWA, '_blank');
+    const mensaje = `*Aviso de Visita - COFARMEN*\n\nHola *${anfitrion}*, se registró el ingreso de:\n👤 *Persona:* ${datos}\n🏢 *Empresa:* ${empresa}\n📍 *Sector:* ${sector}`;
+    window.open(`https://api.whatsapp.com/send?phone=${contactoAnfitrionActual}&text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 
-// Registro
 function registrarIngreso() {
     const modo = document.getElementById('modoApp').value;
     const datos = document.getElementById('datosPersonales').value;
@@ -273,7 +266,7 @@ function registrarIngreso() {
     const observaciones = document.getElementById('observaciones').value;
 
     if (!datos || !sector || !anfitrion) {
-        alert('Complete los campos requeridos (Escaneo, Sector y Anfitrión).');
+        alert('Complete los campos obligatorios (Escaneo, Sector y Anfitrión).');
         return;
     }
 
@@ -294,8 +287,7 @@ function registrarIngreso() {
         body: JSON.stringify(payload)
     })
     .then(() => {
-        alert('Ingreso registrado correctamente.');
-
+        alert('Ingreso registrado con éxito.');
         if (contactoAnfitrionActual && contactoAnfitrionActual !== "N/A") {
             document.getElementById('btnWhatsApp').style.display = 'block';
             enviarWhatsApp();
@@ -303,10 +295,7 @@ function registrarIngreso() {
             limpiarFormulario();
         }
     })
-    .catch(error => {
-        console.error('Error al guardar:', error);
-        alert('Error al intentar registrar el ingreso.');
-    });
+    .catch(error => alert('Error al guardar datos.'));
 }
 
 function limpiarFormulario() {
@@ -315,16 +304,13 @@ function limpiarFormulario() {
     document.getElementById('scannerStatus').textContent = 'Lector Listo';
 
     const modo = document.getElementById('modoApp').value;
-    if (modo !== 'mercadolibre') {
-        document.getElementById('empresa').value = '';
-    }
+    if (modo !== 'mercadolibre') document.getElementById('empresa').value = '';
     if (modo !== 'evento') {
         document.getElementById('sector').value = '';
         document.getElementById('anfitrion').value = '';
         document.getElementById('observaciones').value = '';
     } else {
-        const eventoGuardado = localStorage.getItem('nombreEventoFijo');
-        document.getElementById('observaciones').value = eventoGuardado || '';
+        document.getElementById('observaciones').value = localStorage.getItem('nombreEventoFijo') || '';
     }
 
     document.getElementById('cantidadBultos').value = '1';
