@@ -82,9 +82,6 @@ const maestroSectores = {
         { nombre: "Puebla Adrian", contacto: "5492615320950" },
         { nombre: "Placci Martin", contacto: "5492615320950" }
     ],
-     "Guardia": [
-        { nombre: "seguridad", contacto: "5492615320950" }
-    ],
     "Devolución a Proveedor y/o donaciones": [{ nombre: "Alvarez Cecilia", contacto: "5492615320950" }],
     "EVENTO": [{ nombre: "EVENTO", contacto: "N/A" }],
     "Recepcion Técnica": [
@@ -104,10 +101,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const selectAnfitrion = document.getElementById('anfitrion');
+    const inputManual = document.getElementById('anfitrionManual');
+
     if (selectAnfitrion) {
         selectAnfitrion.addEventListener('change', (e) => {
-            const selectedOption = e.target.options[e.target.selectedIndex];
-            contactoAnfitrionActual = selectedOption ? (selectedOption.dataset.contacto || "N/A") : "";
+            const val = e.target.value;
+            if (val === "MANUAL") {
+                if (inputManual) inputManual.style.display = "block";
+                contactoAnfitrionActual = "N/A";
+            } else {
+                if (inputManual) {
+                    inputManual.style.display = "none";
+                    inputManual.value = "";
+                }
+                const selectedOption = e.target.options[e.target.selectedIndex];
+                contactoAnfitrionActual = selectedOption ? (selectedOption.dataset.contacto || "N/A") : "";
+            }
         });
     }
 
@@ -127,6 +136,38 @@ function cargarSectores() {
         option.textContent = sec;
         selectSector.appendChild(option);
     });
+}
+
+function cargarTodosLosAnfitriones() {
+    const selectAnfitrion = document.getElementById('anfitrion');
+    if (!selectAnfitrion) return;
+    
+    selectAnfitrion.innerHTML = '<option value="">Seleccione propietario/destinatario...</option>';
+    
+    let mapaPersonal = new Map();
+
+    Object.keys(maestroSectores).forEach(sec => {
+        maestroSectores[sec].forEach(p => {
+            if (p.nombre !== "Atención Mostrador" && p.nombre !== "EVENTO" && !mapaPersonal.has(p.nombre)) {
+                mapaPersonal.set(p.nombre, p.contacto);
+            }
+        });
+    });
+
+    const personalOrdenado = Array.from(mapaPersonal.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+
+    personalOrdenado.forEach(([nombre, contacto]) => {
+        const option = document.createElement('option');
+        option.value = nombre;
+        option.textContent = nombre;
+        option.dataset.contacto = contacto;
+        selectAnfitrion.appendChild(option);
+    });
+
+    const optionManual = document.createElement('option');
+    optionManual.value = "MANUAL";
+    optionManual.textContent = "✏️ Otro / Escribir manualmente...";
+    selectAnfitrion.appendChild(optionManual);
 }
 
 function actualizarAnfitriones() {
@@ -151,13 +192,14 @@ function cambiarModoApp(modo) {
     const body = document.body;
     const container = document.querySelector('.app-container');
     
+    const groupSector = document.getElementById('groupSector');
     const groupBultos = document.getElementById('groupBultos');
     const panelEvento = document.getElementById('panelEventoConfig');
     const lblAnfitrion = document.getElementById('lblAnfitrion');
     const inputEmpresa = document.getElementById('empresa');
     const selectSector = document.getElementById('sector');
     const selectAnfitrion = document.getElementById('anfitrion');
-    const inputObs = document.getElementById('observaciones');
+    const inputManual = document.getElementById('anfitrionManual');
     const btnWA = document.getElementById('btnWhatsApp');
 
     const clasesAnteriores = ['modo-normal', 'modo-mercadolibre', 'modo-evento'];
@@ -170,14 +212,22 @@ function cambiarModoApp(modo) {
     body.classList.add(nuevaClase);
     if (container) container.classList.add(nuevaClase);
 
+    if (inputManual) inputManual.style.display = 'none';
+
     if (modo === 'mercadolibre') {
+        if (groupSector) groupSector.style.display = 'none';
         if (groupBultos) groupBultos.style.display = 'block';
         if (panelEvento) panelEvento.style.display = 'none';
-        if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Propietario';
-        if (inputEmpresa) inputEmpresa.value = 'Mercado libre';
+        if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Propietario / Destinatario';
+        if (inputEmpresa) inputEmpresa.value = 'Mercado Libre';
+        
+        if (selectSector) selectSector.value = 'Guardia';
+
+        cargarTodosLosAnfitriones();
         if (btnWA) btnWA.style.display = 'none';
 
     } else if (modo === 'evento') {
+        if (groupSector) groupSector.style.display = 'block';
         if (groupBultos) groupBultos.style.display = 'none';
         if (panelEvento) panelEvento.style.display = 'block';
         if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión';
@@ -193,15 +243,20 @@ function cambiarModoApp(modo) {
         if (eventoGuardado) {
             const inputNombreEvento = document.getElementById('nombreEvento');
             if (inputNombreEvento) inputNombreEvento.value = eventoGuardado;
-            if (inputObs) inputObs.value = eventoGuardado;
+            document.getElementById('observaciones').value = eventoGuardado;
         }
         if (btnWA) btnWA.style.display = 'none';
 
     } else {
+        if (groupSector) groupSector.style.display = 'block';
         if (groupBultos) groupBultos.style.display = 'none';
         if (panelEvento) panelEvento.style.display = 'none';
         if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe';
         if (inputEmpresa) inputEmpresa.value = '';
+        if (selectSector) {
+            selectSector.value = '';
+            actualizarAnfitriones();
+        }
         if (btnWA) btnWA.style.display = 'none';
     }
 }
@@ -262,48 +317,57 @@ function enviarWhatsApp() {
     const datos = document.getElementById('datosPersonales').value;
     const empresa = document.getElementById('empresa').value;
     const sector = document.getElementById('sector').value;
-    const anfitrion = document.getElementById('anfitrion').value;
+    const anfitrion = obtenerNombreAnfitrion();
     const bultos = document.getElementById('cantidadBultos').value;
 
     if (!contactoAnfitrionActual || contactoAnfitrionActual === "N/A") {
-        alert("El anfitrión no posee número registrado.");
+        alert("El destinatario/anfitrión no posee número registrado.");
         return;
     }
 
     let mensaje = "";
 
     if (modo === 'mercadolibre') {
-        // Mensaje personalizado para Mercado Libre / Paquetes
         mensaje = `📦 *¡Hola ${anfitrion}!* Llegó tu pedido, entregado por *${empresa}* (${bultos} bulto/s), que aguarda el retiro en *Puesto 1 de Seguridad*. 🛡️📍`;
     } else {
-        // Mensaje estándar para Visitas / Eventos
         mensaje = `👋 *Aviso de Visita - COFARMEN*\n\nHola *${anfitrion}*, se registró el ingreso de:\n👤 *Persona:* ${datos}\n🏢 *Empresa:* ${empresa}\n📍 *Sector:* ${sector}`;
     }
 
     window.open(`https://api.whatsapp.com/send?phone=${contactoAnfitrionActual}&text=${encodeURIComponent(mensaje)}`, '_blank');
 }
+
+function obtenerNombreAnfitrion() {
+    const selectAnfitrion = document.getElementById('anfitrion');
+    const inputManual = document.getElementById('anfitrionManual');
+    
+    if (selectAnfitrion.value === "MANUAL") {
+        return inputManual ? inputManual.value.trim() : "";
+    }
+    return selectAnfitrion.value;
+}
+
 function registrarIngreso() {
     const modo = document.getElementById('modoApp').value;
     const datos = document.getElementById('datosPersonales').value;
     const empresa = document.getElementById('empresa').value;
-    const sector = document.getElementById('sector').value;
-    const anfitrion = document.getElementById('anfitrion').value;
+    const sector = modo === 'mercadolibre' ? 'Guardia' : document.getElementById('sector').value;
+    const anfitrion = obtenerNombreAnfitrion();
     const cantidadBultos = document.getElementById('cantidadBultos').value;
     const observaciones = document.getElementById('observaciones').value;
 
-    if (!datos || !sector || !anfitrion) {
-        alert('Complete los campos obligatorios (Escaneo, Sector y Anfitrión).');
+    if (!datos || !anfitrion || (!sector && modo !== 'mercadolibre')) {
+        alert('Complete los campos obligatorios (Escaneo y Propietario/Anfitrión).');
         return;
     }
 
     const payload = {
-        modo: modo,
         datosPersonales: datos,
         empresa: empresa,
         sector: sector,
         anfitrion: anfitrion,
-        bultos: modo === 'mercadolibre' ? cantidadBultos : '',
-        observaciones: observaciones
+        observaciones: observaciones,
+        modo: modo,
+        bultos: modo === 'mercadolibre' ? cantidadBultos : ''
     };
 
     fetch(URL_API_GOOGLE, {
@@ -337,6 +401,12 @@ function limpiarFormulario() {
         document.getElementById('observaciones').value = '';
     } else {
         document.getElementById('observaciones').value = localStorage.getItem('nombreEventoFijo') || '';
+    }
+
+    const inputManual = document.getElementById('anfitrionManual');
+    if (inputManual) {
+        inputManual.value = '';
+        inputManual.style.display = 'none';
     }
 
     document.getElementById('cantidadBultos').value = '1';
