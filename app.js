@@ -24,6 +24,7 @@ const maestroSectores = {
         { nombre: "Martin Marcelo", contacto: "5492615320950" },
         { nombre: "Bustos Marcos", contacto: "5492615320950" },
         { nombre: "Videla Javier", contacto: "5492615320950" },
+        { nombre: "Raimundo Julieta", contacto: "5492615320950" },
         { nombre: "Agüero Antonio", contacto: "5492615320950" },
         { nombre: "Velez Daniel", contacto: "N/A" }
     ],
