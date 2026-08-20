@@ -16,7 +16,7 @@ const maestroSectores = {
         { nombre: "Pablo Iacobucci", contacto: "5492614168508" },
         { nombre: "Tissera Mariana", contacto: "5492615320950" }
     ],
-    "CAPITAL HUMANO": [
+    "Mantenimiento": [
         { nombre: "Marsollier Ivan", contacto: "5492615320950" },
         { nombre: "Brizuela Tomas", contacto: "5492615320950" }
     ],
@@ -47,7 +47,6 @@ const maestroSectores = {
     "Comercial": [
         { nombre: "Molina Andres", contacto: "5492615320950" },
         { nombre: "Tescari Maria Jose", contacto: "5492615320950" },
-        { nombre: "Reina Julia", contacto: "5492615320950" },
         { nombre: "Sepulveda Marcela", contacto: "5492615320950" },
         { nombre: "Frigerio Carolina", contacto: "5492615320950" },
         { nombre: "Sanabria Juan", contacto: "5492615320950" },
@@ -60,6 +59,7 @@ const maestroSectores = {
     "Administración osep": [
         { nombre: "Pelayes Sergio", contacto: "5492615320950" },
         { nombre: "Oropel Walter", contacto: "55492615320950" },
+        { nombre: "Merenda Gastón", contacto: "55492615320950" },
         { nombre: "Garay Diego", contacto: "5492615320950" },
         { nombre: "Fernandez Jose Luis", contacto: "5492615320950" },
         { nombre: "Dominguez Diego", contacto: "5492615320950" },
