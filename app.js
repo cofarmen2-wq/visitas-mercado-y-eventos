@@ -49,6 +49,7 @@ const maestroSectores = {
         { nombre: "Tescari Maria Jose", contacto: "5492615320950" },
         { nombre: "Reina Julia", contacto: "5492615320950" },
         { nombre: "Sepulveda Marcela", contacto: "5492615320950" },
+        { nombre: "Frigerio Carolina", contacto: "5492615320950" },
         { nombre: "Sanabria Juan", contacto: "5492615320950" },
         { nombre: "Perez Agustin", contacto: "5492615320950" }
     ],
@@ -62,7 +63,7 @@ const maestroSectores = {
         { nombre: "Garay Diego", contacto: "5492615320950" },
         { nombre: "Fernandez Jose Luis", contacto: "5492615320950" },
         { nombre: "Dominguez Diego", contacto: "5492615320950" },
-        { nombre: "Peroso Vanesa", contacto: "5492615320950" }
+        { nombre: "Perozo Vannesa", contacto: "5492615320950" }
     ],
     "Recepción Nave 1": [
         { nombre: "Paris Sebastian", contacto: "5492615320950" },
