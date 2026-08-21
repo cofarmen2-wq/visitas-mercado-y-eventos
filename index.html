@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Control de Visitas y Eventos</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
   <div class="app-container">
@@ -19,7 +20,7 @@
     <main>
       <!-- Campo del filtro desplegable -->
       <div class="form-group">
-        <label for="buscarPreinvitado">🔍 Buscar Preinvitado:</label>
+        <label for="buscarPreinvitado">🔍 Buscar / Filtrar Preinvitado:</label>
         <input 
           type="text" 
           id="buscarPreinvitado" 
@@ -28,9 +29,11 @@
           autocomplete="off"
         >
         <datalist id="listaPreinvitados">
-          <!-- Opciones cargadas dinámicamente -->
+          <!-- Opciones cargadas dinámicamente desde Apps Script -->
         </datalist>
       </div>
+
+      <div id="reader" style="width: 100%; max-width: 400px; margin: 10px auto; display: none;"></div>
 
       <form id="formRegistro">
         <div class="form-group">
