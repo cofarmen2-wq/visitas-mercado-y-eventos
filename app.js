@@ -94,13 +94,41 @@ function configurarEventos() {
 }
 
 // Control Cámara
+// Control Cámara Optimizado para APK y DNI/QR
 function iniciarCamara() {
   const status = document.getElementById("qrStatus");
   status.textContent = "Solicitando cámara...";
-  
+
+  // Configuración avanzada de escáner y formatos
+  const config = {
+    fps: 15,
+    qrbox: (viewfinderWidth, viewfinderHeight) => {
+      // Caja adaptativa más ancha para DNI y códigos QR
+      const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+      return {
+        width: Math.floor(minEdge * 0.85),
+        height: Math.floor(minEdge * 0.65)
+      };
+    },
+    aspectRatio: 1.0,
+    // Soportar QR y PDF417 (DNI)
+    formatsToSupport: [
+      Html5QrcodeSupportedFormats.QR_CODE,
+      Html5QrcodeSupportedFormats.PDF_417,
+      Html5QrcodeSupportedFormats.CODE_128
+    ]
+  };
+
+  // Requerir alta resolución a la cámara trasera
+  const cameraConfig = {
+    facingMode: { exact: "environment" },
+    width: { min: 1280, ideal: 1920 },
+    height: { min: 720, ideal: 1080 }
+  };
+
   html5QrCode.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: { width: 220, height: 220 } },
+    cameraConfig,
+    config,
     (decodedText) => {
       document.getElementById("dni").value = decodedText;
       status.textContent = "¡Código escaneado!";
@@ -114,8 +142,24 @@ function iniciarCamara() {
     document.getElementById("btnStartQR").style.display = "none";
     document.getElementById("btnStopQR").style.display = "inline-block";
   }).catch(err => {
-    status.textContent = "Error de acceso a la cámara";
-    console.error(err);
+    // Reintento con configuración estándar si la cámara no soporta alta resolución
+    html5QrCode.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 200 } },
+      (decodedText) => {
+        document.getElementById("dni").value = decodedText;
+        status.textContent = "¡Código escaneado!";
+        detenerCamara();
+      },
+      () => { status.textContent = "Buscando QR/DNI..."; }
+    ).then(() => {
+      qrScannerActivo = true;
+      document.getElementById("btnStartQR").style.display = "none";
+      document.getElementById("btnStopQR").style.display = "inline-block";
+    }).catch(e => {
+      status.textContent = "Error: Verifica los permisos de cámara";
+      console.error(e);
+    });
   });
 }
 
