@@ -2,108 +2,100 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control de Acceso y Visitas - COFARMEN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Registro de Visitas</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <!-- Librería Html5Qrcode para escáner -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
 
-  <div class="app-container">
-    <header class="header">
-      <img src="LOGO P1 APP.png" alt="COFARMEN Logo" class="logo">
-      <h1>Control de Acceso</h1>
-    </header>
+  <div class="app-container" id="appContainer">
+    <div class="header">
+      <img src="LOGO P1.png" alt="Logo" class="logo" id="appLogo">
+      <h1 id="appTitle">Registro de Visitas</h1>
+    </div>
 
-    <main class="main-content">
-      
-      <!-- Seleccion de Modo -->
+    <!-- Panel de Selección de Modo -->
+    <div class="form-group">
+      <label for="modoApp">Modo de Operación:</label>
+      <select id="modoApp" class="form-control">
+        <option value="normal">Visita Normal</option>
+        <option value="mercadolibre">Mercado Libre</option>
+        <option value="evento">Evento</option>
+        <option value="preinvitados">Preinvitados</option>
+      </select>
+    </div>
+
+    <!-- Configuración para Modo Evento -->
+    <div id="panelEventoConfig" class="panel-especial" style="display: none;">
+      <h3>Configuración de Evento</h3>
       <div class="form-group">
-        <label for="modoApp"><i class="fa-solid fa-sliders"></i> Modo de Registro</label>
-        <select id="modoApp" class="form-control">
-          <option value="normal" selected>Visita Normal / Proveedores</option>
-          <option value="mercadolibre">Mercado Libre / Paquetería</option>
-          <option value="evento">Evento Especial</option>
-          <option value="preinvitados">Preinvitados</option>
-        </select>
+        <label for="nombreEvento">Nombre del Evento:</label>
+        <input type="text" id="nombreEvento" class="form-control" placeholder="Ej: Conferencia 2026">
+      </div>
+    </div>
+
+    <!-- Buscador / Selector Preinvitados -->
+    <div id="groupPreinvitados" class="form-group" style="display: none;">
+      <label for="selectPreinvitado">Buscar Preinvitado:</label>
+      <select id="selectPreinvitado" class="form-control">
+        <option value="">-- Seleccionar de la lista --</option>
+      </select>
+    </div>
+
+    <!-- Escáner QR -->
+    <div id="groupScanner" class="form-group">
+      <label>Escanear QR / DNI:</label>
+      <div id="reader"></div>
+      <span class="status-text" id="qrStatus">Cámara inactiva</span>
+      <div class="button-group-inline">
+        <button type="button" id="btnStartQR" class="btn btn-secondary">Iniciar Cámara</button>
+        <button type="button" id="btnStopQR" class="btn btn-danger" style="display: none;">Detener</button>
+      </div>
+    </div>
+
+    <!-- Formulario Datos del Visitante -->
+    <form id="formVisita">
+      <div class="form-group">
+        <label for="dni">DNI / Documento:</label>
+        <input type="text" id="dni" class="form-control" placeholder="Número de documento" required>
       </div>
 
-      <!-- Configuración Evento -->
-      <div id="panelEventoConfig" class="panel-especial" style="display: none;">
-        <h3><i class="fa-solid fa-calendar-star"></i> Configuración de Evento</h3>
-        <div class="form-group">
-          <input type="text" id="nombreEvento" class="form-control" placeholder="Nombre del Evento (ej. Capacitación)">
-          <div class="button-group-inline">
-            <button class="btn btn-secondary" onclick="guardarNombreEvento()">Fijar Evento</button>
-            <button class="btn btn-danger" onclick="borrarNombreEvento()">Borrar</button>
-          </div>
-        </div>
+      <div class="form-group">
+        <label for="nombre">Nombre y Apellido:</label>
+        <input type="text" id="nombre" class="form-control" placeholder="Nombre completo" required>
       </div>
 
-      <!-- Lector de Código QR / Barras -->
-      <div id="groupScanner" class="form-group">
-        <label><i class="fa-solid fa-qrcode"></i> Escáner de Documento / QR</label>
-        <div id="reader" style="width: 100%;"></div>
-        <input type="text" id="escaneoRaw" class="form-control" placeholder="Puntee aquí para escanear con pistola..." autofocus>
-        <small id="scannerStatus" class="status-text">Lector Listo</small>
-      </div>
-
-      <!-- Campo Datos Personales -->
-      <div id="groupDatosPersonales" class="form-group">
-        <label for="datosPersonales"><i class="fa-solid fa-id-card"></i> Datos del Visitante</label>
-        <input type="text" id="datosPersonales" class="form-control" placeholder="Apellido, Nombre - DNI">
-      </div>
-
-      <!-- Empresa / Origen -->
-      <div id="groupEmpresa" class="form-group">
-        <label for="empresa"><i class="fa-solid fa-building"></i> Empresa / Procedencia</label>
-        <input type="text" id="empresa" class="form-control" placeholder="Nombre de la empresa">
-      </div>
-
-      <!-- Sector -->
       <div id="groupSector" class="form-group">
-        <label for="sector"><i class="fa-solid fa-sitemap"></i> Sector Destino</label>
-        <select id="sector" class="form-control" onchange="actualizarAnfitriones()">
-          <option value="">Seleccione un sector...</option>
+        <label for="sector">Sector a Visitar:</label>
+        <select id="sector" class="form-control">
+          <option value="">-- Seleccionar Sector --</option>
         </select>
       </div>
 
-      <!-- Anfitrión / Destinatario / Preinvitado -->
       <div id="groupAnfitrion" class="form-group">
-        <label id="lblAnfitrion" for="anfitrion"><i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe</label>
+        <label for="anfitrion">Anfitrión / Contacto:</label>
         <select id="anfitrion" class="form-control">
-          <option value="">Seleccione anfitrión...</option>
+          <option value="">-- Seleccionar Anfitrión --</option>
         </select>
-        <input type="text" id="anfitrionManual" class="form-control" style="display:none; margin-top: 8px;" placeholder="Escriba Apellido y Nombre...">
       </div>
 
-      <!-- Bultos (Mercado Libre) -->
-      <div id="groupBultos" class="form-group" style="display: none;">
-        <label for="cantidadBultos"><i class="fa-solid fa-boxes-stacked"></i> Cantidad de Bultos</label>
-        <input type="number" id="cantidadBultos" class="form-control" value="1" min="1">
+      <div id="groupBultos" class="form-group">
+        <label for="bultos">Bultos / Equipaje:</label>
+        <input type="text" id="bultos" class="form-control" placeholder="Ej: 1 Mochila, Laptop">
       </div>
 
-      <!-- Observaciones -->
-      <div id="groupObservaciones" class="form-group">
-        <label for="observaciones"><i class="fa-solid fa-comment-dots"></i> Observaciones</label>
+      <div class="form-group">
+        <label for="observaciones">Observaciones:</label>
         <textarea id="observaciones" class="form-control" rows="2" placeholder="Notas adicionales..."></textarea>
       </div>
 
-      <!-- Acciones principales -->
       <div class="button-container">
-        <button id="btnRegistrar" class="btn btn-primary btn-block" onclick="registrarIngreso()">
-          <i class="fa-solid fa-check-circle"></i> Registrar Ingreso
-        </button>
-        <button id="btnWhatsApp" class="btn btn-whatsapp btn-block" onclick="enviarWhatsApp()">
-          <i class="fa-brands fa-whatsapp"></i> Notificar por WhatsApp
-        </button>
-        <button class="btn btn-secondary btn-block" onclick="limpiarFormulario()">
-          <i class="fa-solid fa-broom"></i> Limpiar Formulario
-        </button>
+        <button type="submit" id="btnGuardar" class="btn btn-primary btn-block">Registrar Ingreso</button>
+        <button type="button" id="btnWhatsApp" class="btn btn-whatsapp btn-block" style="display: none;">Avisar por WhatsApp</button>
       </div>
-
-    </main>
+    </form>
   </div>
 
   <script src="app.js"></script>
