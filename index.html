@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- CSS (versión v=6 para limpiar la caché del celular) -->
-    <link rel="stylesheet" href="style.css?v=6">
+    <!-- CSS (versión v=7 para limpiar caché) -->
+    <link rel="stylesheet" href="style.css?v=7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
@@ -45,9 +45,10 @@
             </div>
 
             <form id="formVisita" autocomplete="off" onsubmit="event.preventDefault();">
+                <!-- Zona de escaneo ocultable -->
                 <div class="scanner-input-container">
                     <label for="escaneoRaw"><i class="fa-solid fa-qrcode"></i> Esperando Escaneo (DNI o QR)...</label>
-                    <input type="text" id="escaneoRaw" placeholder="Haga clic aquí y escanee..." autofocus required>
+                    <input type="text" id="escaneoRaw" placeholder="Haga clic aquí y escanee..." autofocus>
                     <span class="scanner-status" id="scannerStatus">Lector Listo</span>
                 </div>
 
@@ -55,7 +56,7 @@
                 <div id="reader"></div>
 
                 <div class="form-grid">
-                    <div class="form-group full-width">
+                    <div class="form-group full-width" id="groupDatosPersonales">
                         <label><i class="fa-solid fa-user"></i> Datos Personales / Transportista</label>
                         <input type="text" id="datosPersonales" placeholder="Apellido, Nombre y DNI (Automático)">
                     </div>
@@ -67,17 +68,17 @@
 
                     <div class="form-group" id="groupSector">
                         <label for="sector"><i class="fa-solid fa-map-location-dot"></i> Sector a Visitar</label>
-                        <select id="sector" required onchange="actualizarAnfitriones()">
+                        <select id="sector" onchange="actualizarAnfitriones()">
                             <option value="">Seleccione un sector...</option>
                         </select>
                     </div>
 
                     <div class="form-group" id="groupAnfitrion">
                         <label for="anfitrion" id="lblAnfitrion"><i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe</label>
-                        <select id="anfitrion" required>
+                        <select id="anfitrion">
                             <option value="">Seleccione anfitrión...</option>
                         </select>
-                        <input type="text" id="anfitrionManual" placeholder="Escriba el nombre del destinatario..." style="display: none; margin-top: 6px;">
+                        <input type="text" id="anfitrionManual" placeholder="Escriba Apellido y Nombre..." style="display: none; margin-top: 6px;">
                     </div>
 
                     <div class="form-group" id="groupBultos" style="display: none;">
@@ -107,6 +108,6 @@
         </button>
     </div>
 
-    <script src="app.js?v=6"></script>
+    <script src="app.js?v=7"></script>
 </body>
 </html>
