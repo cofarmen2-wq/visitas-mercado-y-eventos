@@ -1,183 +1,124 @@
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Aplicación de fondo a toda la pantalla */
 html, body {
-    min-height: 100vh;
-    width: 100%;
-    transition: background-color 0.3s ease;
+  width: 100%;
+  max-width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f6f9;
+  color: #333;
 }
 
+/* Adaptación para la barra de estado/notch en APK */
 body {
-    padding: 15px;
-}
-
-/* Modos de Fondo Globales */
-html.modo-normal, body.modo-normal, .app-container.modo-normal {
-    background-color: #f4f6f9 !important;
-    color: #333333;
-}
-
-html.modo-mercadolibre, body.modo-mercadolibre, .app-container.modo-mercadolibre {
-    background-color: #fff159 !important; /* Amarillo Mercado Libre */
-    color: #222222;
-}
-
-html.modo-evento, body.modo-evento, .app-container.modo-evento {
-    background-color: #f7aa06 !important; /* Naranja Evento Masivo */
-    color: #ffffff;
+  padding-top: max(12px, env(safe-area-inset-top));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
 }
 
 .app-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    transition: background-color 0.3s ease;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid rgba(0,0,0,0.1);
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.app-logo {
-    height: 50px;
-}
-
-.mode-select-container select {
-    padding: 8px 12px;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-weight: bold;
-    background-color: #ffffff;
-    color: #333333;
-}
-
-.event-config-panel {
-    background: rgba(255, 255, 255, 0.3);
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    color: inherit;
-}
-
-.event-input-group {
-    display: flex;
-    gap: 8px;
-    margin-top: 6px;
-}
-
-.event-input-group input {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.full-width {
-    grid-column: span 2;
+h2 {
+  text-align: center;
+  margin-top: 0;
+  color: #1e293b;
+  font-size: 1.4rem;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
 }
 
-.form-group label {
-    font-weight: 600;
-    font-size: 0.9rem;
+label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  color: #475569;
 }
 
-input, select, textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-    background-color: #ffffff;
-    color: #333333;
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  height: 44px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background-color: #fff;
+  outline: none;
 }
 
-.scanner-input-container {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin-bottom: 15px;
-}
-
-.scanner-status {
-    font-size: 0.85rem;
-    color: #27ae60;
-    font-weight: bold;
-}
-
-.form-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
+input:focus, select:focus {
+  border-color: #2563eb;
 }
 
 button {
-    cursor: pointer;
-    border: none;
-    border-radius: 6px;
-    padding: 12px;
-    font-size: 1rem;
-    font-weight: bold;
+  width: 100%;
+  min-height: 46px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.2s;
 }
 
-.btn-submit { background-color: #27ae60; color: white; flex: 2; }
-.btn-secondary { background-color: #7f8c8d; color: white; flex: 1; }
-.btn-qr { background-color: #2980b9; color: white; width: 100%; margin-bottom: 10px; }
-.btn-small { padding: 8px 12px; font-size: 0.85rem; }
-.btn-save { background-color: #2980b9; color: white; }
-.btn-danger { background-color: #c0392b; color: white; }
-
-.whatsapp-container {
-    max-width: 800px;
-    margin: 15px auto 0 auto;
+button:active {
+  opacity: 0.8;
 }
 
-.btn-whatsapp {
-    width: 100%;
-    background-color: #25d366;
-    color: white;
-    font-size: 1.1rem;
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
+.btn-primario { background-color: #2563eb; color: #fff; margin-top: 8px; }
+.btn-escaneo { background-color: #0f172a; color: #fff; }
+.btn-secundario { background-color: #64748b; color: #fff; }
+.btn-peligro { background-color: #ef4444; color: #fff; }
+.btn-wa { background-color: #25d366; color: #fff; margin-top: 8px; }
+
+.button-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.panel-evento {
+  background-color: #f1f5f9;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 14px;
 }
 
 #reader {
-    width: 100%;
-    margin-bottom: 10px;
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#scannerStatus {
+  display: block;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 4px;
 }
