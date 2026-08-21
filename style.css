@@ -1,12 +1,11 @@
 :root {
   --primary-color: #0056b3;
   --secondary-color: #6c757d;
-  --success-color: #28a745;
-  --whatsapp-color: #25d366;
+  --success-color: #25d366;
+  --danger-color: #dc3545;
   --bg-color: #f4f6f9;
   --card-bg: #ffffff;
-  --text-color: #333333;
-  --border-radius: 8px;
+  --border-color: #ced4da;
 }
 
 * {
@@ -18,107 +17,149 @@
 
 body {
   background-color: var(--bg-color);
-  color: var(--text-color);
-  padding: 15px;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  transition: background-color 0.3s ease;
+}
+
+/* Modos visuales */
+body.modo-evento {
+  background-color: #eef2ff;
+}
+
+body.modo-mercadolibre {
+  background-color: #fffde7;
+}
+
+body.modo-preinvitados {
+  background-color: #e8f5e9;
 }
 
 .container {
-  max-width: 600px;
-  margin: 0 auto;
+  background-color: var(--card-bg);
+  width: 100%;
+  max-width: 500px;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.header {
+.app-header {
   text-align: center;
   margin-bottom: 20px;
 }
 
-.logo {
+.app-header .logo {
   max-width: 120px;
   height: auto;
   margin-bottom: 10px;
 }
 
-.card {
-  background: var(--card-bg);
-  padding: 20px;
-  border-radius: var(--border-radius);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-h1 {
+.app-header h1 {
   font-size: 1.5rem;
-  color: var(--primary-color);
-}
-
-h2 {
-  font-size: 1.2rem;
-  margin-bottom: 15px;
-  border-bottom: 2px solid var(--bg-color);
-  padding-bottom: 5px;
+  color: #222;
 }
 
 .form-group {
   margin-bottom: 15px;
 }
 
-label {
+.form-group label {
   display: block;
-  margin-bottom: 5px;
   font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
 }
 
-input[type="text"], select {
+.form-group input,
+.form-group select {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   font-size: 1rem;
 }
 
-.btn-group {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
+.panel-dinamico {
+  background: #f8f9fa;
+  border-left: 4px solid var(--primary-color);
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
 }
 
+.panel-dinamico h3 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+/* Escáner */
+.scanner-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#qr-reader {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 10px auto;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#qrStatus {
+  font-size: 0.85rem;
+  color: var(--secondary-color);
+  margin-bottom: 10px;
+}
+
+/* Botones */
 .btn {
-  flex: 1;
+  display: inline-block;
+  width: 100%;
   padding: 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
-  color: #fff;
-  transition: background-color 0.2s;
+  transition: opacity 0.2s;
+  text-align: center;
 }
-
-.btn-primary { background-color: var(--primary-color); }
-.btn-secondary { background-color: var(--secondary-color); }
-.btn-success { background-color: var(--success-color); }
-.btn-whatsapp { background-color: var(--whatsapp-color); }
 
 .btn:hover {
   opacity: 0.9;
 }
 
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.form-actions {
+  margin-top: 20px;
+}
+
 .hidden {
   display: none !important;
-}
-
-.status-text {
-  text-align: center;
-  margin-top: 10px;
-  font-size: 0.9rem;
-  font-weight: bold;
-}
-
-/* Modos de la App */
-body.modo-evento {
-  border-top: 5px solid var(--primary-color);
-}
-
-body.modo-preinvitados {
-  border-top: 5px solid var(--success-color);
 }
