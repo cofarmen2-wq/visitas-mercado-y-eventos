@@ -418,3 +418,15 @@ function limpiarFormulario() {
     document.getElementById('cantidadBultos').value = '1';
     document.getElementById('escaneoRaw').focus();
 }
+let listaPreinvitados = [];
+
+// Cargar la lista al iniciar
+async function cargarPreinvitados() {
+  try {
+    const res = await fetch(URL_API_GOOGLE);
+    listaPreinvitados = await res.json();
+  } catch (err) {
+    console.error("Error al cargar preinvitados", err);
+  }
+}
+document.addEventListener('DOMContentLoaded', () => { cargarPreinvitados(); });
