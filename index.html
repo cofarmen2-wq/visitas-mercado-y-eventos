@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QR-U // Control de Visitas</title>
-    
     <!-- Fuente Formal y Corporativa: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <!-- CSS (versión v=6 para limpiar la caché del celular) -->
     <link rel="stylesheet" href="style.css?v=6">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -25,13 +23,13 @@
                     <p class="subtitle">Control de Accesos</p>
                 </div>
             </div>
-            
             <div class="mode-select-container">
                 <label for="modoApp"><i class="fa-solid fa-sliders"></i> Modo Operación:</label>
                 <select id="modoApp" onchange="cambiarModoApp(this.value)">
                     <option value="normal">Normal</option>
                     <option value="mercadolibre">Mercado Libre</option>
                     <option value="evento">Evento Masivo</option>
+                    <option value="preinvitados">Preinvitados</option>
                 </select>
             </div>
         </header>
@@ -59,7 +57,7 @@
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label><i class="fa-solid fa-user"></i> Datos Personales / Transportista</label>
-                        <input type="text" id="datosPersonales" readonly placeholder="Apellido, Nombre y DNI (Automático)">
+                        <input type="text" id="datosPersonales" placeholder="Apellido, Nombre y DNI (Automático)">
                     </div>
 
                     <div class="form-group" id="groupEmpresa">
