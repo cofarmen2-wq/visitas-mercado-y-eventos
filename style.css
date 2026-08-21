@@ -1,255 +1,43 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  letter-spacing: -0.01em;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Fondo global para toda la pantalla */
-html, body {
-  min-height: 100vh;
-  width: 100%;
-  transition: background-color 0.3s ease;
-}
-
-body {
-  padding: 12px;
-}
-
-/* Modos de Fondo Globales */
-html.modo-normal, body.modo-normal, .app-container.modo-normal {
-  background-color: #f4f6f9 !important;
-  color: #1e293b;
-}
-
-html.modo-mercadolibre, body.modo-mercadolibre, .app-container.modo-mercadolibre {
-  background-color: #fff159 !important;
-  color: #0f172a;
-}
-
-html.modo-evento, body.modo-evento, .app-container.modo-evento {
-  background-color: #ff9800 !important;
-  color: #ffffff;
-}
-
-.app-container {
-  max-width: 800px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  transition: background-color 0.3s ease;
-}
-
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid rgba(0,0,0,0.1);
-  padding-bottom: 15px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.app-logo {
-  height: 45px;
-  width: auto;
-}
-
-.app-header h1 {
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.subtitle {
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
-
-.mode-select-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.mode-select-container select {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 0.95rem;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  font-weight: 600;
-  background-color: #ffffff;
-  color: #0f172a;
-}
-
-.event-config-panel {
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-.event-input-group {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-  flex-wrap: wrap;
-}
-
-.event-input-group input {
-  flex: 1;
-  min-width: 180px;
-}
-
-/* Grilla adaptable a móviles */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 15px;
-}
-
-.full-width {
-  grid-column: span 2;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.form-group label {
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-
-input, select, textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  background-color: #ffffff;
-  color: #0f172a;
-}
-
-.scanner-input-container {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 12px;
-}
-
-.scanner-status {
-  font-size: 0.8rem;
-  color: #16a34a;
-  font-weight: 700;
-}
-
-.form-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-  flex-direction: column;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  padding: 14px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  width: 100%;
-}
-
-.btn-submit {
-  background-color: #16a34a;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #64748b;
-  color: white;
-}
-
-.btn-qr {
-  background-color: #2563eb;
-  color: white;
-  margin-bottom: 10px;
-}
-
-.btn-small {
-  padding: 8px 12px;
-  font-size: 0.85rem;
-  width: auto;
-}
-
-.btn-save {
-  background-color: #2563eb;
-  color: white;
-}
-
-.btn-danger {
-  background-color: #dc2626;
-  color: white;
-}
-
-.whatsapp-container {
-  max-width: 800px;
-  margin: 12px auto 0 auto;
-}
-
-.btn-whatsapp {
-  background-color: #22c55e;
-  color: white;
-  font-size: 1rem;
-  padding: 14px;
-}
-
-#reader {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-/* Ajustes Responsive para Celulares (< 600px) */
-@media (max-width: 600px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-  .full-width {
-    grid-column: span 1;
-  }
-  .app-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .mode-select-container {
-    margin-top: 8px;
-  }
+:root {
+  --primary-color: #0056b3;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --whatsapp-color: #25d366;
+  --bg-color: #f4f6f9;
+  --card-bg: #ffffff;
+  --text-color: #333333;
+  --border-radius: 8px;
 }
 
 /* ==========================================
-   ESTILOS PARA MODO PREINVITADOS
+   ESTILOS DE MODOS DINOÁMICOS (TEMAS)
    ========================================== */
 
-/* Colores e identidad visual */
+/* Modo Mercado Libre */
+html.modo-mercadolibre, body.modo-mercadolibre {
+  --primary-color: #ffdb15;
+  --text-color: #2d3277;
+  background-color: #fffde7 !important;
+}
+
+.app-container.modo-mercadolibre {
+  border-top: 5px solid #ffe600;
+}
+
+/* Modo Evento */
+html.modo-evento, body.modo-evento {
+  --primary-color: #6f42c1;
+  background-color: #f3e8ff !important;
+}
+
+.app-container.modo-evento {
+  border-top: 5px solid #6f42c1;
+}
+
+/* Modo Preinvitados */
 html.modo-preinvitados, body.modo-preinvitados {
+  --primary-color: #20c997;
   background-color: #f0f7ff !important;
 }
 
@@ -257,13 +45,13 @@ html.modo-preinvitados, body.modo-preinvitados {
   border-top: 5px solid #2563eb;
 }
 
-/* Ocultar lector QR, sectores, bultos y panel de eventos */
-.modo-preinvitados .scanner-input-container,
-.modo-preinvitados .btn-qr,
+/* Ocultar elementos en Modo Preinvitados */
+.modo-preinvitados #groupScanner,
 .modo-preinvitados #reader,
 .modo-preinvitados #groupSector,
 .modo-preinvitados #groupBultos,
-.modo-preinvitados #panelEventoConfig {
+.modo-preinvitados #panelEventoConfig,
+.modo-preinvitados #btnWhatsApp {
   display: none !important;
 }
 
@@ -280,4 +68,186 @@ html.modo-preinvitados, body.modo-preinvitados {
 
 .modo-preinvitados #anfitrion:focus {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* ==========================================
+   ESTILOS GENERALES
+   ========================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 500px;
+  background-color: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  max-width: 160px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.2);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* Contenedor de escáner */
+#reader {
+  border: 2px dashed #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.status-text {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Paneles especiales */
+.panel-especial {
+  background-color: #f8f9fa;
+  border-left: 4px solid var(--primary-color);
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+.panel-especial h3 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Botones */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.button-group-inline {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn {
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-whatsapp {
+  background-color: var(--whatsapp-color);
+  color: white;
+}
+
+.btn-whatsapp:hover {
+  background-color: #20ba5a;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #bd2130;
+}
+
+.btn-block {
+  width: 100%;
 }
