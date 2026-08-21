@@ -1,4 +1,4 @@
-// URL de tu Web App desplegada en Google Apps Script
+// URL de la Web App desplegada en Apps Script
 const URL_API_GOOGLE = 'https://script.google.com/macros/s/AKfycbxeRqX9w4SUUu2yGzNre3hVAr-RGTxX08_rZCxUcOWe9G376fqh1IS43c45-SvanGni/exec';
 
 let html5QrCode = null;
@@ -6,8 +6,12 @@ let qrScannerActivo = false;
 let contactoAnfitrionActual = "";
 let listaPreinvitadosGlobal = [];
 
-// Directory completo de Sectores y Anfitriones
+// Directorio completo de Sectores y Anfitriones (Incluye Mercado Libre y Recepciones)
 const maestroSectores = {
+  'Mercado Libre / Cadetería': [
+    { nombre: 'Atención Recepción Nave 1', contacto: '5492615320950' },
+    { nombre: 'Atención Recepción Nave 2', contacto: '5492615320950' }
+  ],
   'PLANTA LOGISTICA': [
     { nombre: 'MUGNECO ADRIAN', contacto: '5492615320950' },
     { nombre: 'Carbajo Rodrigo', contacto: '5492615320950' },
@@ -109,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
   obtenerPreinvitados();
 });
 
-// Carga los sectores en el desplegable
 function cargarSectores() {
   const selectSector = document.getElementById("sector");
   if (!selectSector) return;
@@ -123,13 +126,11 @@ function cargarSectores() {
   });
 }
 
-// Configuración de escuchadores y dinámicas de la app
 function configurarEventos() {
   const selectSector = document.getElementById("sector");
   const selectAnfitrion = document.getElementById("anfitrion");
   const modoApp = document.getElementById("modoApp");
 
-  // Cambio de Sector
   if (selectSector) {
     selectSector.addEventListener("change", (e) => {
       const sector = e.target.value;
@@ -151,7 +152,6 @@ function configurarEventos() {
     });
   }
 
-  // Cambio de Anfitrión
   if (selectAnfitrion) {
     selectAnfitrion.addEventListener("change", (e) => {
       const opt = e.target.selectedOptions[0];
@@ -164,7 +164,6 @@ function configurarEventos() {
     });
   }
 
-  // Cambio de Modo (Normal, Evento, Preinvitados)
   if (modoApp) {
     modoApp.addEventListener("change", (e) => {
       const modo = e.target.value;
@@ -178,7 +177,6 @@ function configurarEventos() {
     });
   }
 
-  // Búsqueda de preinvitados en tiempo real
   const inputBuscarPre = document.getElementById("buscarPreinvitado");
   if (inputBuscarPre) {
     inputBuscarPre.addEventListener("input", (e) => {
@@ -192,14 +190,13 @@ function configurarEventos() {
     });
   }
 
-  // Eventos de botones
   document.getElementById("btnStartQR")?.addEventListener("click", iniciarCamara);
   document.getElementById("btnStopQR")?.addEventListener("click", detenerCamara);
   document.getElementById("formVisita")?.addEventListener("submit", guardarVisita);
   document.getElementById("btnWhatsApp")?.addEventListener("click", enviarWhatsApp);
 }
 
-// Lector de Cámara para DNI Argentino (PDF417) y Código QR
+// Escáner de Cámara para DNI y QR
 function iniciarCamara() {
   const status = document.getElementById("qrStatus");
   if (status) status.textContent = "Iniciando cámara...";
@@ -249,14 +246,12 @@ function detenerCamara() {
   }
 }
 
-// Decodificador de datos escaneados (DNI PDF417 o QR directo)
 function procesarCodigoEscaneado(texto) {
   const status = document.getElementById("qrStatus");
   if (status) status.textContent = "¡Lectura Exitosa!";
 
   const partes = texto.split("@");
   if (partes.length >= 8) {
-    // PDF417 de DNI Físico Argentino
     const apellido = partes[1] || "";
     const nombre = partes[2] || "";
     const dni = partes[4] || partes[1] || "";
@@ -264,15 +259,12 @@ function procesarCodigoEscaneado(texto) {
     document.getElementById("dni").value = dni.trim();
     document.getElementById("nombre").value = `${nombre} ${apellido}`.trim();
   } else if (partes.length >= 2) {
-    // Formatos de DNI reducidos
     document.getElementById("dni").value = (partes[0] || partes[1]).trim();
   } else {
-    // Lectura de QR estándar
     document.getElementById("dni").value = texto.trim();
   }
 }
 
-// Obtener la lista de Preinvitados desde Apps Script mediante doGet
 function obtenerPreinvitados() {
   fetch(`${URL_API_GOOGLE}?tipo=preinvitados`)
     .then(res => res.json())
@@ -284,7 +276,6 @@ function obtenerPreinvitados() {
     .catch(err => console.error("Error al obtener preinvitados:", err));
 }
 
-// Envío del registro de visita hacia Apps Script
 function guardarVisita(e) {
   e.preventDefault();
 
@@ -299,6 +290,7 @@ function guardarVisita(e) {
     anfitrion: document.getElementById("anfitrion")?.value || "",
     modo: modo,
     modoEvento: modo === "evento",
+    bultos: document.getElementById("bultos")?.value || "",
     observaciones: modo === "evento" ? (document.getElementById("nombreEvento")?.value || "") : "",
     esNuevoPreinvitado: modo === "preinvitados"
   };
@@ -319,13 +311,28 @@ function guardarVisita(e) {
   });
 }
 
-// Redirección directa a WhatsApp Web / App
+// Mensajería Dinámica por WhatsApp Adaptada a Cada Modo
 function enviarWhatsApp() {
   if (!contactoAnfitrionActual || contactoAnfitrionActual === "N/A") return;
 
+  const modo = document.getElementById("modoApp")?.value || "normal";
   const nombre = document.getElementById("nombre")?.value || "Un visitante";
+  const empresa = document.getElementById("empresa")?.value || "";
   const sector = document.getElementById("sector")?.value || "";
-  const msj = encodeURIComponent(`Hola, ${nombre} ha llegado a recepción para el sector ${sector}.`);
+  const anfitrion = document.getElementById("anfitrion")?.value || "";
 
-  window.open(`https://wa.me/${contactoAnfitrionActual}?text=${msj}`, '_blank');
+  let mensaje = "";
+
+  if (sector === "Mercado Libre / Cadetería") {
+    mensaje = `📦 *ENTREGA / PAQUETERÍA*\nHola *${anfitrion}*, llegó *${nombre}* (${empresa || 'Cadete'}) a la recepción para entregar un paquete.`;
+  } else if (modo === "evento") {
+    const nombreEvento = document.getElementById("nombreEvento")?.value || "el evento";
+    mensaje = `🎟️ *INGRESO A EVENTO*\nHola *${anfitrion}*, el invitado *${nombre}* (${empresa}) ha ingresado para participar de *${nombreEvento}*.`;
+  } else if (modo === "preinvitados") {
+    mensaje = `📋 *INGRESO DE PREINVITADO*\nHola *${anfitrion}*, se registró el ingreso del preinvitado *${nombre}* (${empresa}).`;
+  } else {
+    mensaje = `📢 *AVISO DE VISITA*\nHola *${anfitrion}*, *${nombre}* (${empresa}) te aguarda en recepción. Sector: *${sector}*.`;
+  }
+
+  window.open(`https://wa.me/${contactoAnfitrionActual}?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
