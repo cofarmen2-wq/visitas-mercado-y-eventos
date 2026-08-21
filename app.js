@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function cargarPreinvitados() {
   try {
-    const res = await fetch(URL_API_GOOGLE);
+    const res = await fetch(`${URL_API_GOOGLE}?tipo=preinvitados`);
     listaPreinvitados = await res.json();
   } catch (err) {
     console.error("Error al cargar lista de preinvitados", err);
@@ -418,19 +418,32 @@ function registrarIngreso() {
 }
 
 function limpiarFormulario() {
-  document.getElementById('escaneoRaw').value = '';
-  document.getElementById('datosPersonales').value = '';
-  document.getElementById('scannerStatus').textContent = 'Lector Listo';
+  const escaneoRaw = document.getElementById('escaneoRaw');
+  if (escaneoRaw) escaneoRaw.value = '';
+  
+  const datosPersonales = document.getElementById('datosPersonales');
+  if (datosPersonales) datosPersonales.value = '';
+
+  const scannerStatus = document.getElementById('scannerStatus');
+  if (scannerStatus) scannerStatus.textContent = 'Lector Listo';
+
   const modo = document.getElementById('modoApp').value;
 
-  if (modo !== 'mercadolibre' && modo !== 'preinvitados') document.getElementById('empresa').value = '';
+  if (modo !== 'mercadolibre' && modo !== 'preinvitados') {
+    const empresa = document.getElementById('empresa');
+    if (empresa) empresa.value = '';
+  }
 
   if (modo !== 'evento') {
-    document.getElementById('sector').value = '';
-    document.getElementById('anfitrion').value = '';
-    document.getElementById('observaciones').value = '';
+    const sector = document.getElementById('sector');
+    if (sector) sector.value = '';
+    const anfitrion = document.getElementById('anfitrion');
+    if (anfitrion) anfitrion.value = '';
+    const observaciones = document.getElementById('observaciones');
+    if (observaciones) observaciones.value = '';
   } else {
-    document.getElementById('observaciones').value = localStorage.getItem('nombreEventoFijo') || '';
+    const observaciones = document.getElementById('observaciones');
+    if (observaciones) observaciones.value = localStorage.getItem('nombreEventoFijo') || '';
   }
 
   const inputManual = document.getElementById('anfitrionManual');
@@ -439,6 +452,8 @@ function limpiarFormulario() {
     inputManual.style.display = 'none';
   }
 
-  document.getElementById('cantidadBultos').value = '1';
-  document.getElementById('escaneoRaw').focus();
+  const cantidadBultos = document.getElementById('cantidadBultos');
+  if (cantidadBultos) cantidadBultos.value = '1';
+
+  if (escaneoRaw) escaneoRaw.focus();
 }
