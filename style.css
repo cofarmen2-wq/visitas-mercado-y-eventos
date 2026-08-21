@@ -221,3 +221,38 @@ button {
         margin-top: 8px;
     }
 }
+/* ==========================================
+   ESTILOS PARA MODO PREINVITADOS
+   ========================================== */
+
+/* Colores e identidad visual para Modo Preinvitados */
+html.modo-preinvitados,
+body.modo-preinvitados {
+    background-color: #f0f7ff;
+}
+
+.app-container.modo-preinvitados {
+    border-top: 5px solid #2563eb; /* Azul corporativo */
+}
+
+/* Ocultar elementos no requeridos en Modo Preinvitados */
+.modo-preinvitados #groupSector,
+.modo-preinvitados #groupBultos,
+.modo-preinvitados #panelEventoConfig {
+    display: none !important;
+}
+
+/* Resaltar la selección de Preinvitado */
+.modo-preinvitados #groupAnfitrion label {
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+.modo-preinvitados #anfitrion {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+.modo-preinvitados #anfitrion:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
