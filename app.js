@@ -112,8 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (selectAnfitrion) {
     selectAnfitrion.addEventListener('change', (e) => {
       const val = e.target.value;
-      if (val === "MANUAL") {
-        if (inputManual) inputManual.style.display = "block";
+      if (val === "MANUAL" || val === "NUEVO_MANUAL") {
+        if (inputManual) {
+          inputManual.style.display = "block";
+          inputManual.placeholder = "Escriba Apellido y Nombre...";
+          inputManual.focus();
+        }
         contactoAnfitrionActual = "N/A";
       } else {
         if (inputManual) {
@@ -122,6 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const selectedOption = e.target.options[e.target.selectedIndex];
         contactoAnfitrionActual = selectedOption ? (selectedOption.dataset.contacto || "N/A") : "";
+        
+        // Autocompletar datos personales en modo Preinvitados
+        if (document.getElementById('modoApp').value === 'preinvitados' && val) {
+          document.getElementById('datosPersonales').value = val;
+        }
       }
     });
   }
@@ -201,6 +210,7 @@ function cambiarModoApp(modo) {
   const container = document.querySelector('.app-container');
   const groupSector = document.getElementById('groupSector');
   const groupBultos = document.getElementById('groupBultos');
+  const groupDatosPersonales = document.getElementById('groupDatosPersonales');
   const panelEvento = document.getElementById('panelEventoConfig');
   const lblAnfitrion = document.getElementById('lblAnfitrion');
   const inputEmpresa = document.getElementById('empresa');
@@ -224,12 +234,14 @@ function cambiarModoApp(modo) {
   if (modo === 'preinvitados') {
     if (groupSector) groupSector.style.display = 'none';
     if (groupBultos) groupBultos.style.display = 'none';
+    if (groupDatosPersonales) groupDatosPersonales.style.display = 'none';
     if (panelEvento) panelEvento.style.display = 'none';
-    if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Preinvitado (Apellido y Nombre)';
+
+    if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Filtrar o Seleccionar Preinvitado';
     if (inputEmpresa) inputEmpresa.value = 'Preinvitado';
 
     if (selectAnfitrion) {
-      selectAnfitrion.innerHTML = '<option value="">Filtrar / Seleccionar Preinvitado...</option>';
+      selectAnfitrion.innerHTML = '<option value="">Filtrar o seleccionar Apellido y Nombre...</option>';
       listaPreinvitados.slice().sort().forEach(nombre => {
         const option = document.createElement('option');
         option.value = nombre;
@@ -237,46 +249,49 @@ function cambiarModoApp(modo) {
         option.dataset.contacto = "N/A";
         selectAnfitrion.appendChild(option);
       });
+      const optionNuevo = document.createElement('option');
+      optionNuevo.value = "NUEVO_MANUAL";
+      optionNuevo.textContent = "✏️ + Agregar Preinvitado no listado...";
+      selectAnfitrion.appendChild(optionNuevo);
     }
     if (btnWA) btnWA.style.display = 'none';
-  } else if (modo === 'mercadolibre') {
-    if (groupSector) groupSector.style.display = 'none';
-    if (groupBultos) groupBultos.style.display = 'block';
-    if (panelEvento) panelEvento.style.display = 'none';
-    if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Propietario / Destinatario';
-    if (inputEmpresa) inputEmpresa.value = 'Mercado Libre';
-    if (selectSector) selectSector.value = 'Guardia';
-    cargarTodosLosAnfitriones();
-    if (btnWA) btnWA.style.display = 'none';
-  } else if (modo === 'evento') {
-    if (groupSector) groupSector.style.display = 'block';
-    if (groupBultos) groupBultos.style.display = 'none';
-    if (panelEvento) panelEvento.style.display = 'block';
-    if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión';
-    if (inputEmpresa) inputEmpresa.value = 'Visita';
-    if (selectSector) {
-      selectSector.value = 'EVENTO';
-      actualizarAnfitriones();
-    }
-    if (selectAnfitrion) selectAnfitrion.value = 'EVENTO';
-    const eventoGuardado = localStorage.getItem('nombreEventoFijo');
-    if (eventoGuardado) {
-      const inputNombreEvento = document.getElementById('nombreEvento');
-      if (inputNombreEvento) inputNombreEvento.value = eventoGuardado;
-      document.getElementById('observaciones').value = eventoGuardado;
-    }
-    if (btnWA) btnWA.style.display = 'none';
+
   } else {
-    if (groupSector) groupSector.style.display = 'block';
-    if (groupBultos) groupBultos.style.display = 'none';
-    if (panelEvento) panelEvento.style.display = 'none';
-    if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe';
-    if (inputEmpresa) inputEmpresa.value = '';
-    if (selectSector) {
-      selectSector.value = '';
-      actualizarAnfitriones();
+    if (groupDatosPersonales) groupDatosPersonales.style.display = 'block';
+
+    if (modo === 'mercadolibre') {
+      if (groupSector) groupSector.style.display = 'none';
+      if (groupBultos) groupBultos.style.display = 'block';
+      if (panelEvento) panelEvento.style.display = 'none';
+      if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-check"></i> Propietario / Destinatario';
+      if (inputEmpresa) inputEmpresa.value = 'Mercado Libre';
+      if (selectSector) selectSector.value = 'Guardia';
+      cargarTodosLosAnfitriones();
+      if (btnWA) btnWA.style.display = 'none';
+    } else if (modo === 'evento') {
+      if (groupSector) groupSector.style.display = 'block';
+      if (groupBultos) groupBultos.style.display = 'none';
+      if (panelEvento) panelEvento.style.display = 'block';
+      if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión';
+      if (inputEmpresa) inputEmpresa.value = 'Visita';
+      if (selectSector) {
+        selectSector.value = 'EVENTO';
+        actualizarAnfitriones();
+      }
+      if (selectAnfitrion) selectAnfitrion.value = 'EVENTO';
+      if (btnWA) btnWA.style.display = 'none';
+    } else {
+      if (groupSector) groupSector.style.display = 'block';
+      if (groupBultos) groupBultos.style.display = 'none';
+      if (panelEvento) panelEvento.style.display = 'none';
+      if (lblAnfitrion) lblAnfitrion.innerHTML = '<i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe';
+      if (inputEmpresa) inputEmpresa.value = '';
+      if (selectSector) {
+        selectSector.value = '';
+        actualizarAnfitriones();
+      }
+      if (btnWA) btnWA.style.display = 'none';
     }
-    if (btnWA) btnWA.style.display = 'none';
   }
 }
 
@@ -354,7 +369,7 @@ function enviarWhatsApp() {
 function obtenerNombreAnfitrion() {
   const selectAnfitrion = document.getElementById('anfitrion');
   const inputManual = document.getElementById('anfitrionManual');
-  if (selectAnfitrion.value === "MANUAL") {
+  if (selectAnfitrion.value === "MANUAL" || selectAnfitrion.value === "NUEVO_MANUAL") {
     return inputManual ? inputManual.value.trim() : "";
   }
   return selectAnfitrion.value;
@@ -362,15 +377,20 @@ function obtenerNombreAnfitrion() {
 
 function registrarIngreso() {
   const modo = document.getElementById('modoApp').value;
-  const datos = document.getElementById('datosPersonales').value;
+  let datos = document.getElementById('datosPersonales').value;
   const empresa = document.getElementById('empresa').value;
   const sector = (modo === 'mercadolibre' || modo === 'preinvitados') ? 'Guardia' : document.getElementById('sector').value;
   const anfitrion = obtenerNombreAnfitrion();
   const cantidadBultos = document.getElementById('cantidadBultos').value;
   const observaciones = document.getElementById('observaciones').value;
 
+  if (modo === 'preinvitados') {
+    datos = anfitrion;
+    document.getElementById('datosPersonales').value = datos;
+  }
+
   if (!datos || !anfitrion) {
-    alert('Complete los campos obligatorios.');
+    alert('Por favor seleccione o ingrese Apellido y Nombre del Preinvitado.');
     return;
   }
 
@@ -392,12 +412,7 @@ function registrarIngreso() {
   })
   .then(() => {
     alert('Ingreso registrado con éxito.');
-    if (contactoAnfitrionActual && contactoAnfitrionActual !== "N/A") {
-      document.getElementById('btnWhatsApp').style.display = 'block';
-      enviarWhatsApp();
-    } else {
-      limpiarFormulario();
-    }
+    limpiarFormulario();
   })
   .catch(error => alert('Error al guardar datos.'));
 }
