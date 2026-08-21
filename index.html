@@ -3,85 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control de Visitas y Eventos</title>
+  <title>Control de Acceso y Visitas - COFARMEN</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
+
   <div class="app-container">
-    <header class="app-header">
-      <div class="logo-container">
-        <img src="LOGO P1 APP.png" alt="Logo" class="app-logo">
-        <h1>Registro de Visitas</h1>
-      </div>
-      <button id="btnToggleModo" class="btn-secondary">Modo Evento</button>
+    <header class="header">
+      <img src="LOGO P1 APP.png" alt="COFARMEN Logo" class="logo">
+      <h1>Control de Acceso</h1>
     </header>
 
-    <main>
-      <!-- Campo del filtro desplegable -->
+    <main class="main-content">
+      
+      <!-- Seleccion de Modo -->
       <div class="form-group">
-        <label for="buscarPreinvitado">🔍 Buscar / Filtrar Preinvitado:</label>
-        <input 
-          type="text" 
-          id="buscarPreinvitado" 
-          list="listaPreinvitados" 
-          placeholder="Escriba un nombre para desplegar lista..."
-          autocomplete="off"
-        >
-        <datalist id="listaPreinvitados">
-          <!-- Opciones cargadas dinámicamente desde Apps Script -->
-        </datalist>
+        <label for="modoApp"><i class="fa-solid fa-sliders"></i> Modo de Registro</label>
+        <select id="modoApp" class="form-control">
+          <option value="normal" selected>Visita Normal / Proveedores</option>
+          <option value="mercadolibre">Mercado Libre / Paquetería</option>
+          <option value="evento">Evento Especial</option>
+          <option value="preinvitados">Preinvitados</option>
+        </select>
       </div>
 
-      <div id="reader" style="width: 100%; max-width: 400px; margin: 10px auto; display: none;"></div>
-
-      <form id="formRegistro">
+      <!-- Configuración Evento -->
+      <div id="panelEventoConfig" class="panel-especial" style="display: none;">
+        <h3><i class="fa-solid fa-calendar-star"></i> Configuración de Evento</h3>
         <div class="form-group">
-          <label for="datosPersonales">Nombre y Apellido / DNI *</label>
-          <input type="text" id="datosPersonales" required placeholder="Ej: Juan Pérez - 30123456">
+          <input type="text" id="nombreEvento" class="form-control" placeholder="Nombre del Evento (ej. Capacitación)">
+          <div class="button-group-inline">
+            <button class="btn btn-secondary" onclick="guardarNombreEvento()">Fijar Evento</button>
+            <button class="btn btn-danger" onclick="borrarNombreEvento()">Borrar</button>
+          </div>
         </div>
+      </div>
 
-        <div class="form-group">
-          <label for="empresa">Empresa</label>
-          <input type="text" id="empresa" placeholder="Empresa de origen">
-        </div>
+      <!-- Lector de Código QR / Barras -->
+      <div id="groupScanner" class="form-group">
+        <label><i class="fa-solid fa-qrcode"></i> Escáner de Documento / QR</label>
+        <div id="reader" style="width: 100%;"></div>
+        <input type="text" id="escaneoRaw" class="form-control" placeholder="Puntee aquí para escanear con pistola..." autofocus>
+        <small id="scannerStatus" class="status-text">Lector Listo</small>
+      </div>
 
-        <div class="form-group">
-          <label for="sector">Sector de Destino</label>
-          <select id="sector">
-            <option value="">Seleccione un sector...</option>
-            <option value="PLANTA LOGISTICA">PLANTA LOGISTICA</option>
-            <option value="CAPITAL HUMANO">CAPITAL HUMANO</option>
-            <option value="Gerencia">Gerencia</option>
-            <option value="Administracion">Administracion</option>
-            <option value="Comercial">Comercial</option>
-            <option value="Cajas">Cajas</option>
-            <option value="Sistemas">Sistemas</option>
-            <option value="Recepcion Técnica">Recepcion Técnica</option>
-            <option value="Mantenimiento">Mantenimiento</option>
-            <option value="EVENTO">EVENTO</option>
-          </select>
-        </div>
+      <!-- Campo Datos Personales -->
+      <div id="groupDatosPersonales" class="form-group">
+        <label for="datosPersonales"><i class="fa-solid fa-id-card"></i> Datos del Visitante</label>
+        <input type="text" id="datosPersonales" class="form-control" placeholder="Apellido, Nombre - DNI">
+      </div>
 
-        <div class="form-group">
-          <label for="anfitrion">Anfitrión</label>
-          <input type="text" id="anfitrion" placeholder="Persona a visitar">
-        </div>
+      <!-- Empresa / Origen -->
+      <div id="groupEmpresa" class="form-group">
+        <label for="empresa"><i class="fa-solid fa-building"></i> Empresa / Procedencia</label>
+        <input type="text" id="empresa" class="form-control" placeholder="Nombre de la empresa">
+      </div>
 
-        <div class="form-group">
-          <label for="bultos">Bultos / Pertenencias</label>
-          <input type="text" id="bultos" placeholder="Ej: 1 mochila, 1 laptop">
-        </div>
+      <!-- Sector -->
+      <div id="groupSector" class="form-group">
+        <label for="sector"><i class="fa-solid fa-sitemap"></i> Sector Destino</label>
+        <select id="sector" class="form-control" onchange="actualizarAnfitriones()">
+          <option value="">Seleccione un sector...</option>
+        </select>
+      </div>
 
-        <div class="form-group">
-          <label for="observaciones">Observaciones</label>
-          <textarea id="observaciones" rows="3" placeholder="Detalles adicionales..."></textarea>
-        </div>
+      <!-- Anfitrión / Destinatario / Preinvitado -->
+      <div id="groupAnfitrion" class="form-group">
+        <label id="lblAnfitrion" for="anfitrion"><i class="fa-solid fa-user-tie"></i> Anfitrión / Quien Recibe</label>
+        <select id="anfitrion" class="form-control">
+          <option value="">Seleccione anfitrión...</option>
+        </select>
+        <input type="text" id="anfitrionManual" class="form-control" style="display:none; margin-top: 8px;" placeholder="Escriba Apellido y Nombre...">
+      </div>
 
-        <button type="submit" id="btnGuardar" class="btn-primary">Registrar Ingreso</button>
-      </form>
+      <!-- Bultos (Mercado Libre) -->
+      <div id="groupBultos" class="form-group" style="display: none;">
+        <label for="cantidadBultos"><i class="fa-solid fa-boxes-stacked"></i> Cantidad de Bultos</label>
+        <input type="number" id="cantidadBultos" class="form-control" value="1" min="1">
+      </div>
 
-      <div id="mensajeEstado" class="mensaje-oculto"></div>
+      <!-- Observaciones -->
+      <div id="groupObservaciones" class="form-group">
+        <label for="observaciones"><i class="fa-solid fa-comment-dots"></i> Observaciones</label>
+        <textarea id="observaciones" class="form-control" rows="2" placeholder="Notas adicionales..."></textarea>
+      </div>
+
+      <!-- Acciones principales -->
+      <div class="button-container">
+        <button id="btnRegistrar" class="btn btn-primary btn-block" onclick="registrarIngreso()">
+          <i class="fa-solid fa-check-circle"></i> Registrar Ingreso
+        </button>
+        <button id="btnWhatsApp" class="btn btn-whatsapp btn-block" onclick="enviarWhatsApp()">
+          <i class="fa-brands fa-whatsapp"></i> Notificar por WhatsApp
+        </button>
+        <button class="btn btn-secondary btn-block" onclick="limpiarFormulario()">
+          <i class="fa-solid fa-broom"></i> Limpiar Formulario
+        </button>
+      </div>
+
     </main>
   </div>
 
