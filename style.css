@@ -10,10 +10,7 @@
   --border-radius: 8px;
 }
 
-/* ==========================================
-   OPTIMIZACIONES PARA APK / MÓVIL
-   ========================================== */
-
+/* Optimización para pantalla táctil y APK */
 html, body {
   width: 100%;
   height: 100%;
@@ -23,69 +20,6 @@ html, body {
   -webkit-user-select: none;
   user-select: none;
 }
-
-/* ==========================================
-   ESTILOS DE MODOS DINÁMICOS (TEMAS)
-   ========================================== */
-
-/* Modo Mercado Libre */
-html.modo-mercadolibre, body.modo-mercadolibre {
-  --primary-color: #ffdb15;
-  --text-color: #2d3277;
-  background-color: #fffde7 !important;
-}
-
-.app-container.modo-mercadolibre {
-  border-top: 5px solid #ffe600;
-}
-
-/* Modo Evento */
-html.modo-evento, body.modo-evento {
-  --primary-color: #6f42c1;
-  background-color: #f3e8ff !important;
-}
-
-.app-container.modo-evento {
-  border-top: 5px solid #6f42c1;
-}
-
-/* Modo Preinvitados */
-html.modo-preinvitados, body.modo-preinvitados {
-  --primary-color: #20c997;
-  background-color: #f0f7ff !important;
-}
-
-.app-container.modo-preinvitados {
-  border-top: 5px solid #2563eb;
-}
-
-/* Ocultar elementos en Modo Preinvitados */
-.modo-preinvitados #groupScanner,
-.modo-preinvitados #reader,
-.modo-preinvitados #groupSector,
-.modo-preinvitados #groupBultos,
-.modo-preinvitados #panelEventoConfig,
-.modo-preinvitados #btnWhatsApp {
-  display: none !important;
-}
-
-.modo-preinvitados #groupAnfitrion label {
-  color: #1d4ed8;
-  font-weight: 600;
-}
-
-.modo-preinvitados #anfitrion {
-  border-color: #3b82f6;
-  background-color: #eff6ff;
-}
-
-.modo-preinvitados #anfitrion:focus {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
-
-/* ==========================================
-   ESTILOS GENERALES Y ESTRUCTURA DE LA APP
-   ========================================== */
 
 * {
   box-sizing: border-box;
@@ -114,10 +48,33 @@ body {
   transition: all 0.3s ease;
 }
 
-/* ==========================================
-   HEADER Y LOGO REAJUSTADO PARA APK
-   ========================================== */
+/* Modos visuales */
+html.modo-mercadolibre, body.modo-mercadolibre {
+  --primary-color: #ffdb15;
+  --text-color: #2d3277;
+  background-color: #fffde7 !important;
+}
 
+html.modo-evento, body.modo-evento {
+  --primary-color: #6f42c1;
+  background-color: #f3e8ff !important;
+}
+
+html.modo-preinvitados, body.modo-preinvitados {
+  --primary-color: #20c997;
+  background-color: #f0f7ff !important;
+}
+
+.modo-preinvitados #groupScanner,
+.modo-preinvitados #reader,
+.modo-preinvitados #groupSector,
+.modo-preinvitados #groupBultos,
+.modo-preinvitados #panelEventoConfig,
+.modo-preinvitados #btnWhatsApp {
+  display: none !important;
+}
+
+/* Header y Logo ajustado */
 .header {
   text-align: center;
   margin-bottom: 12px;
@@ -138,10 +95,7 @@ body {
   color: var(--primary-color);
 }
 
-/* ==========================================
-   FORMULARIO E INPUTS COMPACTOS
-   ========================================== */
-
+/* Formularios */
 .form-group {
   margin-bottom: 12px;
 }
@@ -162,7 +116,6 @@ body {
   background-color: #ffffff;
   -webkit-appearance: none;
   appearance: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-control:focus {
@@ -175,15 +128,25 @@ textarea.form-control {
   resize: none;
 }
 
-/* ==========================================
-   LECTOR Y PANELES
-   ========================================== */
-
+/* Lector QR arreglado */
 #reader {
-  border: 2px dashed #ccc;
-  border-radius: 6px;
+  width: 100%;
+  min-height: 250px;
+  background-color: #000000;
+  border: 2px dashed #cccccc;
+  border-radius: 8px;
   overflow: hidden;
   margin-bottom: 6px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
 }
 
 .status-text {
@@ -201,18 +164,7 @@ textarea.form-control {
   border-radius: 4px;
 }
 
-.panel-especial h3 {
-  font-size: 0.9rem;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* ==========================================
-   BOTONES ADAPTADOS A DISPOSITIVOS TÁCTILES
-   ========================================== */
-
+/* Botones táctiles */
 .button-container {
   display: flex;
   flex-direction: column;
@@ -239,33 +191,14 @@ textarea.form-control {
   align-items: center;
   gap: 8px;
   min-height: 44px;
-  transition: background-color 0.2s, transform 0.1s;
 }
 
 .btn:active {
   transform: scale(0.97);
 }
 
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.btn-whatsapp {
-  background-color: var(--whatsapp-color);
-  color: white;
-}
-
-.btn-secondary {
-  background-color: var(--secondary-color);
-  color: white;
-}
-
-.btn-danger {
-  background-color: var(--danger-color);
-  color: white;
-}
-
-.btn-block {
-  width: 100%;
-}
+.btn-primary { background-color: var(--primary-color); color: white; }
+.btn-whatsapp { background-color: var(--whatsapp-color); color: white; }
+.btn-secondary { background-color: var(--secondary-color); color: white; }
+.btn-danger { background-color: var(--danger-color); color: white; }
+.btn-block { width: 100%; }
