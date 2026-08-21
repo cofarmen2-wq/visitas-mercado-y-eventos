@@ -2,100 +2,98 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Registro de Visitas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visitas Mercado y Eventos</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Librería Html5Qrcode para escáner -->
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <!-- Librería HTML5 QR Code para el escáner de cámara -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
 
-  <div class="app-container" id="appContainer">
-    <div class="header">
-      <img src="LOGO P1.png" alt="Logo" class="logo" id="appLogo">
-      <h1 id="appTitle">Registro de Visitas</h1>
-    </div>
+  <div class="container">
+    <header class="header">
+      <img src="LOGO P1 APP.png" alt="Logo App" class="logo">
+      <h1>Registro de Visitas y Eventos</h1>
+    </header>
 
-    <!-- Panel de Selección de Modo -->
-    <div class="form-group">
-      <label for="modoApp">Modo de Operación:</label>
-      <select id="modoApp" class="form-control">
-        <option value="normal">Visita Normal</option>
-        <option value="mercadolibre">Mercado Libre</option>
-        <option value="evento">Evento</option>
-        <option value="preinvitados">Preinvitados</option>
-      </select>
-    </div>
-
-    <!-- Configuración para Modo Evento -->
-    <div id="panelEventoConfig" class="panel-especial" style="display: none;">
-      <h3>Configuración de Evento</h3>
-      <div class="form-group">
-        <label for="nombreEvento">Nombre del Evento:</label>
-        <input type="text" id="nombreEvento" class="form-control" placeholder="Ej: Conferencia 2026">
-      </div>
-    </div>
-
-    <!-- Buscador / Selector Preinvitados -->
-    <div id="groupPreinvitados" class="form-group" style="display: none;">
-      <label for="selectPreinvitado">Buscar Preinvitado:</label>
-      <select id="selectPreinvitado" class="form-control">
-        <option value="">-- Seleccionar de la lista --</option>
-      </select>
-    </div>
-
-    <!-- Escáner QR -->
-    <div id="groupScanner" class="form-group">
-      <label>Escanear QR / DNI:</label>
-      <div id="reader"></div>
-      <span class="status-text" id="qrStatus">Cámara inactiva</span>
-      <div class="button-group-inline">
-        <button type="button" id="btnStartQR" class="btn btn-secondary">Iniciar Cámara</button>
-        <button type="button" id="btnStopQR" class="btn btn-danger" style="display: none;">Detener</button>
-      </div>
-    </div>
-
-    <!-- Formulario Datos del Visitante -->
-    <form id="formVisita">
-      <div class="form-group">
-        <label for="dni">DNI / Documento:</label>
-        <input type="text" id="dni" class="form-control" placeholder="Número de documento" required>
-      </div>
-
-      <div class="form-group">
-        <label for="nombre">Nombre y Apellido:</label>
-        <input type="text" id="nombre" class="form-control" placeholder="Nombre completo" required>
-      </div>
-
-      <div id="groupSector" class="form-group">
-        <label for="sector">Sector a Visitar:</label>
-        <select id="sector" class="form-control">
-          <option value="">-- Seleccionar Sector --</option>
+    <main>
+      <!-- Selección de Modo de Uso -->
+      <section class="card">
+        <label for="modoApp"><strong>Modo de Uso:</strong></label>
+        <select id="modoApp">
+          <option value="normal">Visita Normal</option>
+          <option value="evento">Evento</option>
+          <option value="preinvitados">Lista Preinvitados</option>
         </select>
-      </div>
+      </section>
 
-      <div id="groupAnfitrion" class="form-group">
-        <label for="anfitrion">Anfitrión / Contacto:</label>
-        <select id="anfitrion" class="form-control">
-          <option value="">-- Seleccionar Anfitrión --</option>
-        </select>
-      </div>
+      <!-- Panel Configuración de Evento (Visibilidad según modo) -->
+      <section id="panelEventoConfig" class="card hidden">
+        <h2>Configuración del Evento</h2>
+        <div class="form-group">
+          <label for="nombreEvento">Nombre del Evento:</label>
+          <input type="text" id="nombreEvento" placeholder="Ej: Conferencia 2026">
+        </div>
+      </section>
 
-      <div id="groupBultos" class="form-group">
-        <label for="bultos">Bultos / Equipaje:</label>
-        <input type="text" id="bultos" class="form-control" placeholder="Ej: 1 Mochila, Laptop">
-      </div>
+      <!-- Panel Preinvitados (Visibilidad según modo) -->
+      <section id="grouppreinvitados" class="card hidden">
+        <h2>Búsqueda de Preinvitados</h2>
+        <div class="form-group">
+          <input type="text" id="buscarPreinvitado" placeholder="Buscar por Nombre o DNI...">
+        </div>
+      </section>
 
-      <div class="form-group">
-        <label for="observaciones">Observaciones:</label>
-        <textarea id="observaciones" class="form-control" rows="2" placeholder="Notas adicionales..."></textarea>
-      </div>
+      <!-- Control de Escáner QR / DNI -->
+      <section class="card">
+        <h2>Escanear QR / DNI</h2>
+        <div id="qr-reader" style="width: 100%; max-width: 500px; margin: 0 auto;"></div>
+        <p id="qrStatus" class="status-text"></p>
+        <div class="btn-group">
+          <button type="button" id="btnStartQR" class="btn btn-primary">Iniciar Cámara</button>
+          <button type="button" id="btnStopQR" class="btn btn-secondary" style="display:none;">Detener Cámara</button>
+        </div>
+      </section>
 
-      <div class="button-container">
-        <button type="submit" id="btnGuardar" class="btn btn-primary btn-block">Registrar Ingreso</button>
-        <button type="button" id="btnWhatsApp" class="btn btn-whatsapp btn-block" style="display: none;">Avisar por WhatsApp</button>
-      </div>
-    </form>
+      <!-- Formulario Principal -->
+      <form id="formVisita" class="card">
+        <h2>Datos del Visitante</h2>
+
+        <div class="form-group">
+          <label for="sector">Sector:</label>
+          <select id="sector" required>
+            <option value="">Seleccione un sector...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="anfitrion">Anfitrión / Contacto:</label>
+          <select id="anfitrion" required>
+            <option value="">Seleccione anfitrión...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="dni">DNI / Documento:</label>
+          <input type="text" id="dni" placeholder="Número de documento" required>
+        </div>
+
+        <div class="form-group">
+          <label for="nombre">Nombre Completo:</label>
+          <input type="text" id="nombre" placeholder="Nombre y Apellido" required>
+        </div>
+
+        <div class="form-group">
+          <label for="empresa">Empresa / Procedencia:</label>
+          <input type="text" id="empresa" placeholder="Empresa u Organización">
+        </div>
+
+        <div class="btn-group">
+          <button type="submit" class="btn btn-success">Guardar Visita</button>
+          <button type="button" id="btnWhatsApp" class="btn btn-whatsapp" style="display:none;">Enviar WhatsApp</button>
+        </div>
+      </form>
+    </main>
   </div>
 
   <script src="app.js"></script>
